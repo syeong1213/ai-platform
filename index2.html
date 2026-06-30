@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SR Peptide AI Formulation & PK Platform (Integrated Master v2)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+.chart-container {    
+    position: relative;    
+    width: 100%;    
+    max-width: 1000px;    
+    margin-left: auto;    
+    margin-right: auto;    
+    height: 380px;    
+    max-height: 55vh;
+}
+.tab-btn.active {    
+    background-color: #1E3A8A;    
+    color: #ffffff;    
+    border-color: #1E3A8A;
+}
+.control-slider {    
+    -webkit-appearance: none;    
+    width: 100%;    
+    height: 6px;    
+    border-radius: 3px;    
+    background: #334155;    
+    outline: none;
+}
+.control-slider::-webkit-slider-thumb {    
+    -webkit-appearance: none;    
+    appearance: none;    
+    width: 18px;    
+    height: 18px;    
+    border-radius: 50%;    
+    background: #3B82F6;    
+    cursor: pointer;    
+    transition: transform 0.1s ease;
+}
+.control-slider::-webkit-slider-thumb:hover {    
+    transform: scale(1.2);
+}
+.kpi-card { transition: transform 0.2s ease-in-out; }
+.kpi-card:hover { transform: translateY(-5px); }
+.process-box {    
+    background-color: #1E293B;    
+    border-left: 6px solid #2563EB;    
+    padding: 1.5rem;    
+    margin-bottom: 0.5rem;    
+    border-radius: 0.5rem;    
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+.arrow-down {    
+    text-align: center;    
+    font-size: 2.5rem;    
+    color: #475569;    
+    margin: 0.5rem 0;    
+    line-height: 1;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+</style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased pb-20">
+<nav class="bg-slate-950 border-b border-slate-800 sticky top-0 z-50 px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">    
+    <div class="flex items-center space-x-2">        
+        <div class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>        
+        <span class="font-black text-sm tracking-wider text-slate-300">DDS R&amp;D CENTER AI MASTER SYSTEMS</span>    
+    </div>    
+    <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">        
+        <button id="mainTabSema" onclick="switchProject('sema')" class="px-6 py-2 rounded-lg text-sm font-bold transition-all bg-blue-600 text-white">            
+            <i class="fa-solid fa-dna mr-1.5"></i> 1. SR-Semaglutide Engine        
+        </button>        
+        <button id="mainTabTirz" onclick="switchProject('tirz')" class="px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-400 hover:text-slate-200 ml-1">            
+            <i class="fa-solid fa-capsules mr-1.5"></i> 2. SR-Tirzepatide Engine        
+        </button>    
+    </div>
+</nav>
+
+<div id="project_section_sema" class="project-module-view">    
+    <header class="bg-slate-950 text-white py-12 px-6 shadow-2xl border-b border-blue-900/40">        
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">            
+            <div>                
+                <div class="inline-flex items-center gap-2 bg-blue-950 text-blue-400 font-bold px-3.5 py-1.5 rounded-full text-xs mb-3 border border-blue-800/60 tracking-wider">                    
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ACTIVE BIOWAIVER &amp; IVIVC ENGINE                
+                </div>                
+                <h1 class="text-3xl md:text-5xl font-black mb-3 tracking-tight bg-gradient-to-r from-blue-400 via-indigo-200 to-amber-400 bg-clip-text text-transparent">SR-Semaglutide Formulation AI Optimizer</h1>                
+                <p class="text-base text-slate-400 max-w-3xl leading-relaxed">                    
+                    제조 처방 데이터를 학습한 인공지능 예측 모델과 IVIVC(생체외-생체내 상관성) 검증 엔진을 통합했습니다. 고분자 비율 및 타겟 로딩에 따른 거동 예측은 물론, In-Vitro 비커 용출 데이터를 통한 In-Vivo 동물/임상 PK 예측 시뮬레이션을 실시간 제공합니다.                
+                </p>            
+            </div>            
+            <div class="bg-slate-900 p-4 rounded-xl border border-blue-900/30 text-xs text-slate-400 space-y-1 w-full md:w-auto">                
+                <p><strong>Database Source:</strong> SR_Sema_Master_v2</p>                
+                <p><strong>IVIVC Standard:</strong> FDA Level A Correlation Model</p>                
+                <p><strong>UI/UX Pattern:</strong> Unified Control Dashboard</p>            
+            </div>        
+        </div>    
+    </header>    
+    <main class="max-w-7xl mx-auto px-6 mt-10 space-y-12">        
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">            
+            <div class="bg-slate-950 rounded-2xl p-6 border-t-4 border-blue-600 kpi-card">                
+                <p class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-1">Max In-Vivo Exposure</p>                
+                <p class="text-3xl font-black text-white">8,743</p>                
+                <p class="text-xs text-slate-400 font-medium mt-1">ng&middot;day/mL (AUC)</p>                
+                <div class="mt-4 text-xs font-bold text-emerald-400 bg-emerald-950/50 px-2 py-1 rounded w-max border border-emerald-900/50">Optimal Target Lot 076</div>            
+            </div>            
+            <div class="bg-slate-950 rounded-2xl p-6 border-t-4 border-amber-500 kpi-card">                
+                <p class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-1">Longest Half-Life</p>                
+                <p class="text-3xl font-black text-white">25.5</p>                
+                <p class="text-xs text-slate-400 font-medium mt-1">Days</p>                
+                <div class="mt-4 text-xs font-bold text-emerald-400 bg-emerald-950/50 px-2 py-1 rounded w-max border border-emerald-900/50">Sustained Release Approved</div>            
+            </div>            
+            <div class="bg-slate-950 rounded-2xl p-6 border-t-4 border-rose-500 kpi-card">                
+                <p class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-1">Initial Burst Control</p>                
+                <p class="text-3xl font-black text-white">875</p>                
+                <p class="text-xs text-slate-400 font-medium mt-1">ng/mL (Cmax)</p>                
+                <div class="mt-4 text-xs font-bold text-amber-400 bg-amber-950/50 px-2 py-1 rounded w-max border border-amber-900/50">Safety Boundary Checked</div>            
+            </div>            
+            <div class="bg-slate-950 rounded-2xl p-6 border-t-4 border-emerald-500 kpi-card">                
+                <p class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-1">Total Evaluated Lots</p>                
+                <p class="text-3xl font-black text-white">53</p>                
+                <p class="text-xs text-slate-400 font-medium mt-1">Database Batches</p>                
+                <div class="mt-4 text-xs font-bold text-blue-400 bg-blue-950/50 px-2 py-1 rounded w-max border border-blue-900/50">SOP Matrix Synced</div>            
+            </div>        
+        </section>        
+        <div class="flex border-b border-slate-800 p-1 bg-slate-950 rounded-xl max-w-4xl">            
+            <button id="tabPredict" class="tab-btn active flex-1 py-3 text-center rounded-lg font-bold text-sm transition-all" onclick="switchSemaSubTab('predict')">처방 기반 예측 (Formulation ➔ PK)</button>            
+            <button id="tabIvivc" class="tab-btn flex-1 py-3 text-center rounded-lg font-bold text-sm text-slate-400 hover:text-white transition-all" onclick="switchSemaSubTab('ivivc')">IVIVC &amp; 바이오웨이버</button>            
+            <button id="tabAnalytics" class="tab-btn flex-1 py-3 text-center rounded-lg font-bold text-sm text-slate-400 hover:text-white transition-all" onclick="switchSemaSubTab('analytics')">데이터 분석 인포그래픽</button>            
+            <button id="tabProcess" class="tab-btn flex-1 py-3 text-center rounded-lg font-bold text-sm text-slate-400 hover:text-white transition-all" onclick="switchSemaSubTab('process')">제조 공정 흐름 (SOP)</button>        
+        </div>        
+        <div id="predictTabContent" class="space-y-8">            
+            <div class="grid grid-
