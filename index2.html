@@ -34,7 +34,7 @@
             <button id="mainTabTirz" onclick="switchProject('tirz')" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200 ml-1">                
                 <i class="fa-solid fa-capsules mr-1.5"></i> 2. SR-Tirzepatide Engine (PT404 &amp; PT414L)            
             </button>            
-            <button id="mainTabSheet" onclick="switchProject('datasheet')" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200 ml-1">                
+            <button id="mainTabSheet" onclick="switchProject('datasheet')" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 ml-1">                
                 <i class="fa-solid fa-table mr-1.5"></i> 3. 마스터 통합 데이터 시트            
             </button>        
         </div>    
@@ -64,7 +64,7 @@
                         <h3 class="font-bold text-slate-200 border-b border-slate-800 pb-1.5 mb-2">고분자 매트릭스 및 공정 변수 컨트롤</h3>                        
                         <div>                            
                             <div class="flex justify-between mb-1"><span>Polymer Matrix (RG503H Ratio)</span><span id="lbl-403-rg503" class="text-teal-400 font-mono font-bold">100%</span></div>                            
-                            <input type="range" id="sld-403-rg503" min="0" max="100" value="100" oninput="runPt403Engine()" class="w-full accent-teal-500">                        
+                            <input type="range" id="sld-403-rg503" min="0" max="100" value="100" oninput="runPt403 Engine()" class="w-full accent-teal-500">                        
                         </div>                        
                         <div>                            
                             <div class="flex justify-between mb-1"><span>고분자 농도 (mg/mL)</span><span id="lbl-403-pconc" class="text-slate-300 font-mono">30 mg/mL</span></div>                            
@@ -214,17 +214,23 @@
             </div>            
             <div id="sub-panel-pt414l-sim" class="sub-panel active mt-6 space-y-6">                
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">                    
-                    <div class="lg:col-span-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3 text-[11px] font-semibold">                        
+                    <div class="lg:col-span-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3 text-[11px] font-semibold max-h-[580px] overflow-y-auto">                        
                         <div class="flex justify-between items-center border-b border-slate-800 pb-1.5 mb-1">                            
-                            <h4 class="font-bold text-slate-200">SR-Tirzepatide 확장형 고분자 매트릭스</h4>                            
-                            <span class="px-1.5 py-0.5 rounded bg-indigo-950 border border-indigo-800 text-[10px] text-indigo-400 font-mono font-bold">PT404 &amp; PT414L 확장</span>                        
+                            <h4 class="font-bold text-slate-200">SR-Tirzepatide 마스터 고분자 매트릭스</h4>                            
+                            <span class="px-1.5 py-0.5 rounded bg-indigo-950 border border-indigo-800 text-[10px] text-indigo-400 font-mono font-bold">11종 Full 사양</span>                        
                         </div>                        
-                        <div><div class="flex justify-between mb-0.5"><span>RG503H (Standard PLGA)</span><span id="lbl-414-rg503" class="text-amber-400 font-mono">50.0%</span></div><input type="range" id="sld-414-rg503" min="0" max="100" step="0.1" value="50.0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
-                        <div><div class="flex justify-between mb-0.5"><span>RG504H (High MW PLGA)</span><span id="lbl-414-rg504" class="text-amber-400 font-mono">25.0%</span></div><input type="range" id="sld-414-rg504" min="0" max="100" step="0.1" value="25.0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
-                        <div><div class="flex justify-between mb-0.5"><span>RG752H (High LA Ratio PLGA)</span><span id="lbl-414-rg752" class="text-amber-400 font-mono">25.0%</span></div><input type="range" id="sld-414-rg752" min="0" max="100" step="0.1" value="25.0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
-                        <div><div class="flex justify-between mb-0.5"><span>RG755S (Ultra High MW PLGA)</span><span id="lbl-414-rg755" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-rg755" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
-                        <div><div class="flex justify-between mb-0.5"><span>R202H (PLA Ester End)</span><span id="lbl-414-r202" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-r202" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
-                        <div><div class="flex justify-between mb-0.5"><span>RG502H (Low MW PLGA) ➔ Burst 유도</span><span id="lbl-414-rg502" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-rg502" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                                                
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_RG502H_Ratio (Low MW)</span><span id="lbl-414-rg502" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-rg502" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_RG503H_Ratio (Standard)</span><span id="lbl-414-rg503" class="text-amber-400 font-mono">50.0%</span></div><input type="range" id="sld-414-rg503" min="0" max="100" step="0.1" value="50.0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_RG504H_Ratio (High MW)</span><span id="lbl-414-rg504" class="text-amber-400 font-mono">25.0%</span></div><input type="range" id="sld-414-rg504" min="0" max="100" step="0.1" value="25.0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_RG653H_Ratio (Slow Release)</span><span id="lbl-414-rg653" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-rg653" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_RG752H_Ratio (High LA PLGA)</span><span id="lbl-414-rg752" class="text-amber-400 font-mono">25.0%</span></div><input type="range" id="sld-414-rg752" min="0" max="100" step="0.1" value="25.0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_RG753H_Ratio (High LA Slow)</span><span id="lbl-414-rg753" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-rg753" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_RG753S_Ratio (Ester end)</span><span id="lbl-414-rg753s" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-rg753s" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_R202H_Ratio (PLA Low)</span><span id="lbl-414-r202" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-r202" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_R203H_Ratio (PLA Mid)</span><span id="lbl-414-r203" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-r203" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_R205S_Ratio (PLA Ester)</span><span id="lbl-414-r205s" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-r205s" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                        <div><div class="flex justify-between mb-0.5"><span>Polymer_PDLG 5505G_Ratio</span><span id="lbl-414-pdlg" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-pdlg" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
+                                                
                         <h4 class="font-bold text-slate-200 border-b border-slate-800 pb-1.5 pt-1 mb-1">공정 및 투여 변수 조절</h4>                        
                         <div><div class="flex justify-between mb-0.5"><span>고분자 농도 (mg/mL)</span><span id="lbl-414-pconc" class="text-slate-300 font-mono">50 mg/mL</span></div><input type="range" id="sld-414-pconc" min="10" max="150" value="50" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
                         <div><div class="flex justify-between mb-0.5"><span>반제 API Loading (%)</span><span id="lbl-414-load" class="text-slate-300 font-mono">10.25%</span></div><input type="range" id="sld-414-load" min="5" max="25" step="0.05" value="10.25" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
@@ -412,7 +418,6 @@
             buildTirzOverlaySelector();        
         });
 
-        // 💡 [완벽 복구] 3번 탭의 정상 가시화를 위해 대상 타겟 라우팅 ID를 datasheet 매칭으로 수정
         function switchProject(target) {            
             document.getElementById('main-content-pt403').classList.add('hidden');            
             document.getElementById('main-content-pt414l').classList.add('hidden');            
@@ -434,12 +439,20 @@
             }        
         }
 
+        // 서브 탭 제어 함수 수정 (크래시 및 누락 방지 안정화)
         function switchSubTab(proj, subId) {            
-            document.querySelectorAll(`#main-content-${proj} .sub-panel`).forEach(p => p.classList.add('hidden'));            
-            document.querySelectorAll(`#main-content-${proj} .sub-tab-btn`).forEach(b => b.classList.remove('active', 'text-white'));
+            const panels = document.querySelectorAll(`#main-content-${proj} .sub-panel`);
+            const btns = document.querySelectorAll(`#main-content-${proj} .sub-tab-btn`);
+            
+            panels.forEach(p => p.classList.add('hidden'));            
+            btns.forEach(b => b.classList.remove('active', 'text-white'));
 
-            document.getElementById(`sub-panel-${proj}-${subId}`).classList.remove('hidden');            
-            document.getElementById(`sub-btn-${proj}-${subId}`).classList.add('active', 'text-white');                        
+            const targetPanel = document.getElementById(`sub-panel-${proj}-${subId}`);
+            const targetBtn = document.getElementById(`sub-btn-${proj}-${subId}`);
+            
+            if (targetPanel) targetPanel.classList.remove('hidden');            
+            if (targetBtn) targetBtn.classList.add('active', 'text-white');                        
+            
             if(subId === 'info') { Plotly.Plots.resize('plotly3DWorkspace'); }        
         }
 
@@ -632,12 +645,18 @@
         }
 
         function runPt414Engine() {            
+            // 11종 확장 고분자 파라미터 수집 구조 확립
+            const t502 = document.getElementById('sld-414-rg502').value;
             const t3 = document.getElementById('sld-414-rg503').value;            
             const t4 = document.getElementById('sld-414-rg504').value;            
+            const t653 = document.getElementById('sld-414-rg653').value;
             const t752 = document.getElementById('sld-414-rg752').value;            
-            const t755 = document.getElementById('sld-414-rg755').value;            
+            const t753 = document.getElementById('sld-414-rg753').value;
+            const t753s = document.getElementById('sld-414-rg753s').value;
             const r202 = document.getElementById('sld-414-r202').value;            
-            const t502 = document.getElementById('sld-414-rg502').value;
+            const r203 = document.getElementById('sld-414-r203').value;
+            const r205s = document.getElementById('sld-414-r205s').value;
+            const pdlg = document.getElementById('sld-414-pdlg').value;
 
             const pconc = document.getElementById('sld-414-pconc').value;            
             const load = document.getElementById('sld-414-load').value;            
@@ -645,28 +664,38 @@
             const feed = document.getElementById('sld-414-feed').value;            
             const dose = document.getElementById('sld-414-dose').value;
 
-            document.getElementById('lbl-414-rg503').innerText = t3 + "%";            
-            document.getElementById('lbl-414-rg504').innerText = t4 + "%";            
-            document.getElementById('lbl-414-rg752').innerText = t752 + "%";            
-            document.getElementById('lbl-414-rg755').innerText = t755 + "%";            
-            document.getElementById('lbl-414-r202').innerText = r202 + "%";            
-            document.getElementById('lbl-414-rg502').innerText = t502 + "%";
+            // 11종 라벨 가시성 업데이트 적용
+            const targets = [
+                { id: 'rg502', val: t502 }, { id: 'rg503', val: t3 }, { id: 'rg504', val: t4 },
+                { id: 'rg653', val: t653 }, { id: 'rg752', val: t752 }, { id: 'rg753', val: t753 },
+                { id: 'rg753s', val: t753s }, { id: 'r202', val: r202 }, { id: 'r203', val: r203 },
+                { id: 'r205s', val: r205s }, { id: 'pdlg', val: pdlg }
+            ];
+            
+            targets.forEach(item => {
+                const element = document.getElementById(`lbl-414-${item.id}`);
+                if (element) {
+                    element.innerText = Number(item.val).toFixed(1) + "%";
+                    element.className = Number(item.val) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";
+                }
+            });
 
-            document.getElementById('lbl-414-rg752').className = Number(t752) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-rg755').className = Number(t755) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-r202').className = Number(r202) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-rg502').className = Number(t502) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";
+            document.getElementById('lbl-414-pconc').innerText = pconc + " mg/mL";
+            document.getElementById('lbl-414-load').innerText = load + "%";
+            document.getElementById('lbl-414-temp').innerText = temp + "°C";
+            document.getElementById('lbl-414-feed').innerText = feed + " mL/min";
+            document.getElementById('lbl-414-dose').innerText = dose + " mg/kg";
 
-            let polyWeight = (Number(t3) + Number(t4)*1.05 + Number(t752)*1.15 + Number(t755)*1.25 + Number(r202)*1.3 + Number(t502)*0.85) / 100;            
+            // 가중치 매트릭스 계산 연동
+            let polyWeight = (Number(t502)*0.85 + Number(t3) + Number(t4)*1.05 + Number(t653)*1.1 + Number(t752)*1.15 + Number(t753)*1.2 + Number(t753s)*1.18 + Number(r202)*1.3 + Number(r203)*1.35 + Number(r205s)*1.32 + Number(pdlg)*1.22) / 100;            
             let factor = polyWeight * (pconc/currentBaseline414.pconc) * (load/currentBaseline414.load) * (temp/currentBaseline414.temp) * (currentBaseline414.feed/feed) * (dose/2.0);                        
             
-            let cx = currentBaseline414.cmax * factor;            
+            let burstFactor = Math.exp((Number(t502) / 100) * 2.8);
+            let cx = currentBaseline414.cmax * factor * (1.0 + (burstFactor - 1.0) * 0.4);            
             let ac = (currentBaseline414.cmax * 7.85) * factor;            
             let yld = Math.min(99.5, 78.50 * (temp/currentBaseline414.temp));            
             let gaa = Math.max(0.01, 0.090 * (currentBaseline414.temp/temp));            
-            
-            // 💡 RG502H 비중에 결합된 선형 초기방출 가속 가중치 공식
-            let brst = 19.78 * (load/currentBaseline414.load) * (1.0 + (Number(t502) / 100) * 1.5);
+            let brst = 19.78 * (load/currentBaseline414.load) * burstFactor;
 
             document.getElementById('t_status_pk_summary').innerText = `${cx.toFixed(2)} / ${ac.toFixed(1)}`;            
             document.getElementById('t_status_yield').innerText = yld.toFixed(2) + "%";            
@@ -679,15 +708,14 @@
             document.getElementById('pk-414-auc').innerText = ac.toFixed(2);
 
             if(tChart) {                
-                tChart.data.datasets[0].data = [33*factor, 194*factor, 302*factor, 147*factor, cx, 317*factor, 141*factor, 174*factor, 161*factor, 21];                
+                tChart.data.datasets[0].data = [33*factor*burstFactor, 194*factor*burstFactor, 302*factor*(1.0 + (burstFactor-1)*0.2), 147*factor, cx, 317*factor, 141*factor, 174*factor, 161*factor, 21];                
                 tChart.update();            
             }        
         }
 
-        // 💡 [2번 탭 그래프 크래시 복구] 엘리먼트 존재 여부를 체크하여 차트 렌더링 정상화
         function buildTirzOverlaySelector() {            
             const sel = document.getElementById('chart_overlay_selector');            
-            if(!sel) return; // 팩터 누락 오류 방지
+            if(!sel) return;
             sel.innerHTML = '';            
             Object.keys(TIRZ_OVERLAYS).forEach(k => {                
                 let opt = document.createElement('option');                
@@ -761,7 +789,7 @@
 
                 document.getElementById('upload-status-text').innerText = `완료: ${validCount}건 적재`;                
                 alert(`[엑셀 적재 완료] 총 ${validCount}개의 핵심 데이터가 3번 뷰어에 덤프되었으며, 1, 2번 엔진 연산 조건이 초기화되었습니다.`);                
-                filterMasterTable();        
+                filterMasterTable();            
             };            
             reader.readAsArrayBuffer(file);        
         }
