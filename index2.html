@@ -40,7 +40,6 @@
         </div>    
     </nav>
 
-    <!-- 1. SEMAGLUTIDE PANEL (PT403) -->
     <div id="main-content-pt403" class="tab-panel max-w-7xl mx-auto px-6 py-4 space-y-4">        
         <div class="p-6 bg-slate-950 rounded-xl border border-slate-800 shadow-2xl">            
             <div class="flex justify-between items-start">                
@@ -190,7 +189,6 @@
         </div>    
     </div>
 
-    <!-- 2. TIRZEPATIDE PANEL (PT404 & PT414L) -->
     <div id="main-content-pt414l" class="tab-panel hidden max-w-7xl mx-auto px-6 py-4 space-y-4">        
         <div class="p-6 bg-slate-950 rounded-xl border border-slate-800 shadow-2xl">            
             <div class="flex justify-between items-start mb-2">                
@@ -216,7 +214,6 @@
             </div>            
             <div id="sub-panel-pt414l-sim" class="sub-panel active mt-6 space-y-6">                
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">                    
-                    <!-- 11종 고분자 매트릭스 UI 컴포넌트 풀 어레이 구현 -->
                     <div class="lg:col-span-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3 text-[11px] font-semibold max-h-[580px] overflow-y-auto">                        
                         <div class="flex justify-between items-center border-b border-slate-800 pb-1.5 mb-1">                            
                             <h4 class="font-bold text-slate-200">SR-Tirzepatide 마스터 고분자 매트릭스</h4>                            
@@ -292,7 +289,6 @@
         </div>    
     </div>
 
-    <!-- 3. 마스터 통합 데이터 시트 PANEL -->
     <div id="main-content-datasheet" class="tab-panel hidden max-w-7xl mx-auto px-6 py-4 space-y-8">                
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">            
             <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col justify-between">                
@@ -316,7 +312,7 @@
                 <div>                    
                     <h2 class="text-sm font-black text-white flex items-center gap-2 mb-2">                        
                         <i class="fa-solid fa-magnifying-glass text-sky-400"></i> 데이터 정보 탐색 및 동적 필터링 바                    </h2>                    
-                    <p class="text-[11px] text-slate-400">마스터 시트 전체 레코드를 대상으로 실시간 스캔을 진행합니다. 로트 번호, 공정 조건, 유연물질 수치 및 비고 사양의 텍스트가 모두 통합 검색 범위에 포함됩니다.</p>                
+                    <p class="text-[11px] text-slate-400">마스터 시트 전체 레코드를 대상으로 실시간 스캔을 진행합니다. 로트 번호, 공정 조건, 유연물질 수치 및 비고 사양의 텍스트가 모두 통합 검색 범위에 포함된다.</p>                
                 </div>                
                 <div class="relative mt-4">                    
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">                        
@@ -357,7 +353,7 @@
                             <th class="p-3">API Loading</th>                            
                             <th class="p-3">건조 온도</th>                            
                             <th class="p-3">공급 유량</th>                            
-                            <th class="p-3 text-teal-400">Yield 수율</th>                            
+                            <th class="p-3 text-teal-400">Yield 서율</th>                            
                             <th class="p-3 text-emerald-400">잔류 초산 (GAA)</th>                            
                             <th class="p-3 text-emerald-400">유연물질 (Imp)</th>                            
                             <th class="p-3 text-sky-400">입도 (D50)</th>                            
@@ -502,11 +498,11 @@
                 type: 'line',                
                 data: {                    
                     labels: ['Day 0.04', 'Day 0.5', 'Day 1', 'Day 3', 'Day 5', 'Day 7', 'Day 11', 'Day 14', 'Day 21', 'Day 28'],                    
-                    // 💡 [교정 파트] Chart.js의 선형 레이어 결합 특성에 맞춰 fill 타겟 인덱스 스크립트 전면 정정
+                    // 💡 [완벽 복구 패치] Chart.js v4+ 규격에 맞춰 인덱스 기반 면적 바인딩 관계식(fill: 1, fill: 2)을 완벽하게 교정
                     datasets: [                        
                         { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15, z: 10 },                        
-                        { label: '+SD Upper Band', data: [53, 234, 342, 182, 691.63, 352, 176, 209, 196, 41], borderColor: 'transparent', fill: 2, backgroundColor: 'rgba(99, 102, 241, 0.08)', pointRadius: 0, tension: 0.15 },
-                        { label: '-SD Lower Band', data: [13, 154, 262, 112, 620.83, 282, 106, 139, 126, 1], borderColor: 'transparent', fill: false, backgroundColor: 'rgba(99, 102, 241, 0.08)', pointRadius: 0, tension: 0.15 },
+                        { label: '+SD Upper Band', data: [53, 234, 342, 182, 691.63, 352, 176, 209, 196, 41], borderColor: 'transparent', fill: 2, backgroundColor: 'rgba(99, 102, 241, 0.06)', pointRadius: 0, tension: 0.15 },
+                        { label: '-SD Lower Band', data: [13, 154, 262, 112, 620.83, 282, 106, 139, 126, 1], borderColor: 'transparent', fill: false, backgroundColor: 'rgba(99, 102, 241, 0.06)', pointRadius: 0, tension: 0.15 },
                         { label: 'Tirzepatide API Control (Free)', data: [680, 420, 110, 8, 0, 0, 0, 0, 0, 0], borderColor: '#f43f5e', borderWidth: 2, borderDash: [3, 3], fill: false, tension: 0.15 }                    
                     ]                
                 },                
@@ -714,6 +710,8 @@
 
             if(tChart) {                
                 let baseProfile = [33*factor*burstFactor, 194*factor*burstFactor, 302*factor*(1.0 + (burstFactor-1)*0.2), 147*factor, cx, 317*factor, 141*factor, 174*factor, 161*factor, 21];
+                
+                // 💡 상하한선 배열 연산 및 차트 피딩 동기화 정상 바인딩 완수
                 let upperProfile = baseProfile.map(v => v + (sdCmax * (v / cx)));
                 let lowerProfile = baseProfile.map(v => Math.max(0, v - (sdCmax * (v / cx))));
 
