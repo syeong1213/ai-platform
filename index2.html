@@ -86,7 +86,6 @@
     </div>
 </nav>
 
-<!-- 1. SEMAGLUTIDE SECTION -->
 <div id="project_section_sema" class="project-module-view">    
     <header class="bg-slate-950 text-white py-12 px-6 shadow-2xl border-b border-blue-900/40">        
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">            
@@ -172,15 +171,15 @@
                         </div>                        
                         <div class="chart-container"><canvas id="predictChart"></canvas></div>                    
                     </div>                    
-                    <div class="grid grid-cols-3 gap-6 text-center">                        
+                    <div class="grid grid-cols-3 gap-6 text-center text-xs">                        
                         <div class="bg-slate-950 rounded-xl p-5 border border-slate-800">                            
-                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Predicted Cmax</h4><p id="predCmax" class="text-2xl font-black text-white">-</p><div id="cmaxStatus" class="mt-3 text-xs font-semibold px-2 py-1 rounded inline-block"></div>                        
+                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Predicted Cmax</h4><p id="semaCmax" class="text-2xl font-black text-white">-</p><div id="cmaxStatus" class="mt-3 text-xs font-semibold px-2 py-1 rounded inline-block"></div>                        
                         </div>                        
                         <div class="bg-slate-950 rounded-xl p-5 border border-slate-800">                            
-                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Predicted AUC</h4><p id="predAUC" class="text-2xl font-black text-white">-</p><div id="aucStatus" class="mt-3 text-xs font-semibold px-2 py-1 rounded inline-block"></div>                        
+                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Predicted AUC</h4><p id="semaAUC" class="text-2xl font-black text-white">-</p><div id="aucStatus" class="mt-3 text-xs font-semibold px-2 py-1 rounded inline-block"></div>                        
                         </div>                        
                         <div class="bg-slate-950 rounded-xl p-5 border border-slate-800">                            
-                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Predicted Half-life</h4><p id="predHalfLife" class="text-2xl font-black text-white">-</p><div id="halfLifeStatus" class="mt-3 text-xs font-semibold px-2 py-1 rounded inline-block"></div>                        
+                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Predicted Half-life</h4><p id="semaHalf" class="text-2xl font-black text-white">-</p><div id="halfLifeStatus" class="mt-3 text-xs font-semibold px-2 py-1 rounded inline-block"></div>                        
                         </div>                    
                     </div>                
                 </div>            
@@ -241,7 +240,6 @@
     </main>
 </div>
 
-<!-- 2. TIRZEPATIDE SECTION -->
 <div id="project_section_tirz" class="project-module-view hidden">    
     <header class="bg-slate-950 border-b border-slate-800 py-6 px-6">        
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">            
@@ -333,7 +331,7 @@
                 <div class="lg:col-span-5 bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">                    
                     <h3 class="font-bold border-b border-slate-800 pb-2">🎯 원하는 타겟 파라미터 정의</h3>                    
                     <div><label class="block mb-1">목표 Cmax 최고농도 (ng/mL)</label><input type="number" id="target_cmax" value="400" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
-                    <div><label class="block mb-1">목표 Tmax 도달 시간 (일)</label><input type="number" id="target_tmax" value="14" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
+                    <div><label class="block mb-1">목aint Tmax 도달 시간 (일)</label><input type="number" id="target_tmax" value="14" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
                     <div><label class="block mb-1">목표 AUC_last (ng*day/mL)</label><input type="number" id="target_auc" value="6000" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
                     <div><label class="block mb-1">목표 1일차 Burst 허용한계 (%)</label><input type="number" id="target_burst" value="10" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
                     <button id="opt_action_btn" onclick="runTirzOptimizationLoop()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded transition-all">🚀 AI 제형 최적화 시작</button>                
@@ -371,7 +369,6 @@
     </main>
 </div>
 
-<!-- 3. DATASHEET EXPLORER SECTION -->
 <div id="project_section_explorer" class="project-module-view hidden max-w-7xl mx-auto px-6 mt-6 space-y-8">
     <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-xl">
         <h2 class="text-xl font-black text-white flex items-center gap-2"><i class="fa-solid fa-square-plus text-emerald-400"></i> 새로운 실험 결과 및 제형 데이터 추가 등록 (SD 편차 항목 포함)</h2>
@@ -448,22 +445,31 @@ function switchProject(type) {
 
 function switchSemaSubTab(mode) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-white'));
-    document.querySelectorAll('.sub-pane').forEach(p => p.classList.add('hidden'));
+    
+    const pContent = document.getElementById('predictTabContent');
+    const iContent = document.getElementById('ivivcTabContent');
+    const aContent = document.getElementById('analyticsTabContent');
+    const prContent = document.getElementById('processTabContent');
+    
+    if(pContent) pContent.classList.add('hidden');
+    if(iContent) iContent.classList.add('hidden');
+    if(aContent) aContent.classList.add('hidden');
+    if(prContent) prContent.classList.add('hidden');
 
     if (mode === 'predict') {
         document.getElementById('tabPredict').classList.add('active', 'text-white');
-        document.getElementById('predictTabContent').classList.remove('hidden');
+        if(pContent) pContent.classList.remove('hidden');
     } else if (mode === 'ivivc') {
         document.getElementById('tabIvivc').classList.add('active', 'text-white');
-        document.getElementById('ivivcTabContent').classList.remove('hidden');
+        if(iContent) iContent.classList.remove('hidden');
         updateSemaIVIVCSimulator();
     } else if (mode === 'analytics') {
         document.getElementById('tabAnalytics').classList.add('active', 'text-white');
-        document.getElementById('analyticsTabContent').classList.remove('hidden');
+        if(aContent) aContent.classList.remove('hidden');
         renderSemaAnalyticsTab();
     } else {
         document.getElementById('tabProcess').classList.add('active', 'text-white');
-        document.getElementById('processTabContent').classList.remove('hidden');
+        if(prContent) prContent.classList.remove('hidden');
     }
 }
 
@@ -471,8 +477,11 @@ function switchTirzSubTab(tabId) {
     document.querySelectorAll('.t-sub-pane').forEach(pane => pane.classList.add('hidden'));
     document.querySelectorAll('[id^="tab_btn_"]').forEach(btn => btn.className = "px-5 py-3.5 font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200");
 
-    document.getElementById('tab_content_' + tabId).classList.remove('hidden');
-    document.getElementById('tab_btn_' + tabId).className = "px-5 py-3.5 font-semibold border-b-2 border-indigo-500 text-indigo-400 bg-slate-900/40";
+    const tContent = document.getElementById('tab_content_' + tabId);
+    if(tContent) tContent.classList.remove('hidden');
+    
+    const tBtn = document.getElementById('tab_btn_' + tabId);
+    if(tBtn) tBtn.className = "px-5 py-3.5 font-semibold border-b-2 border-indigo-500 text-indigo-400 bg-slate-900/40";
 }
 
 function updateSemaPredictor() {
@@ -487,9 +496,10 @@ function updateSemaPredictor() {
     document.getElementById('valLoading').textContent = `${loading}%`;
 
     const activeProfile = [11.3 * (loading/12), 121.6 * (rg503/0.75), 230.5, 340.2 * (135/dryTemp), 180.5, 110.2, 65.4, 20.5];        
-    document.getElementById('predCmax').innerHTML = `${Math.round(340.2 * (135/dryTemp))} ng/mL`;
-    document.getElementById('predAUC').innerHTML = `${Math.round(8743 * (loading/12)).toLocaleString()} ng·d/mL`;
-    document.getElementById('predHalfLife').innerHTML = `${(25.5 * (rg503/0.75)).toFixed(1)} Days`;
+    
+    document.getElementById('semaCmax').innerHTML = `${Math.round(340.2 * (135/dryTemp))} ng/mL`;
+    document.getElementById('semaAUC').innerHTML = `${Math.round(8743 * (loading/12)).toLocaleString()} ng·d/mL`;
+    document.getElementById('semaHalf').innerHTML = `${(25.5 * (rg503/0.75)).toFixed(1)} Days`;
 
     updateSemaStatusDecorators({ Cmax: 340.2 * (135/dryTemp), AUC: 8743 * (loading/12), HalfLife: 25.5 * (rg503/0.75) });
     renderSemaPredictChart(activeProfile);
@@ -503,9 +513,10 @@ function updateSemaStatusDecorators(pred) {
 
 function renderSemaPredictChart(profile) {
     const labels = ["Day 1", "Day 3", "Day 7", "Day 14", "Day 21", "Day 28", "Day 35", "Day 42"];
+    const ctx = document.getElementById('predictChart');
+    if(!ctx) return;
     if (!mainChart) {
-        const ctx = document.getElementById('predictChart').getContext('2d');
-        mainChart = new Chart(ctx, {
+        mainChart = new Chart(ctx.getContext('2d'), {
             type: 'line',
             data: { labels: labels, datasets: [{ label: 'Active Semaglutide Run', data: profile, borderColor: '#2563EB', backgroundColor: 'rgba(37,99,235,0.1)', fill: true, tension: 0.4 }] },
             options: { maintainAspectRatio: false }
@@ -533,10 +544,8 @@ function executeSemaAIOptimize() {
     document.getElementById('optResultContent').classList.remove('hidden');
     document.getElementById('recPolymerType').textContent = "SR-Sema Blended Matrix A";
     document.getElementById('recRG503Ratio').textContent = "78%";
-    document.getElementById('recLoading').textContent = "13.5%";
     document.getElementById('recDryTemp').textContent = "142 °C";
     document.getElementById('recFeedRate').textContent = "6.8 mL/min";
-    document.getElementById('recWashTime').textContent = "1.0% PVA / 180m";
 }
 
 function syncSemaFormulationInVitro() {
@@ -562,11 +571,13 @@ function updateSemaIVIVCSimulator() {
     document.getElementById('biowaiverDecisionText').textContent = "승인 적합 (PASS)";
     document.getElementById('biowaiverBadge').className = "p-4 rounded border text-emerald-400 bg-emerald-950 border-emerald-900";
 
+    const cv1 = document.getElementById('ivivcLineChart');
+    const cv2 = document.getElementById('ivivcPkChart');
+    if(!cv1 || !cv2) return;
+
     if (!ivivcLineChart) {
-        const ctx1 = document.getElementById('ivivcLineChart').getContext('2d');
-        ivivcLineChart = new Chart(ctx1, { type: 'line', data: { labels: labels, datasets: [{ label: 'In-Vitro Dissolution (%)', data: inVitro, borderColor: '#10B981' }] }, options: { maintainAspectRatio: false } });
-        const ctx2 = document.getElementById('ivivcPkChart').getContext('2d');
-        ivivcPkChart = new Chart(ctx2, { type: 'line', data: { labels: labels, datasets: [{ label: 'Predicted In-Vivo PK (ng/mL)', data: pk, borderColor: '#F59E0B', fill: true }] }, options: { maintainAspectRatio: false } });
+        ivivcLineChart = new Chart(cv1.getContext('2d'), { type: 'line', data: { labels: labels, datasets: [{ label: 'In-Vitro Dissolution (%)', data: inVitro, borderColor: '#10B981' }] }, options: { maintainAspectRatio: false } });
+        ivivcPkChart = new Chart(cv2.getContext('2d'), { type: 'line', data: { labels: labels, datasets: [{ label: 'Predicted In-Vivo PK (ng/mL)', data: pk, borderColor: '#F59E0B', fill: true }] }, options: { maintainAspectRatio: false } });
     } else {
         ivivcLineChart.data.datasets[0].data = inVitro; ivivcLineChart.update();
         ivivcPkChart.data.datasets[0].data = pk; ivivcPkChart.update();
@@ -574,11 +585,13 @@ function updateSemaIVIVCSimulator() {
 }
 
 function renderSemaAnalyticsTab() {
+    const cvPoly = document.getElementById('polymerChart');
+    const cvHist = document.getElementById('historicalPkChart');
+    if(!cvPoly || !cvHist) return;
+
     if (!polymerChart) {
-        const ctxPoly = document.getElementById('polymerChart').getContext('2d');
-        polymerChart = new Chart(ctxPoly, { type: 'doughnut', data: { datasets: [{ data: [45, 45, 10], backgroundColor: ['#1D4ED8', '#F59E0B', '#10B981'] }], labels: ['Pure RG503H', 'Blended 제형', '기타'] }, options: { maintainAspectRatio: false } });
-        const ctxHist = document.getElementById('historicalPkChart').getContext('2d');
-        historicalChart = new Chart(ctxHist, { type: 'line', data: { labels: ["D1","D7","D14","D21","D28","D42"], datasets: [{ label: 'Sema Target Run Successful', data: [121, 340, 180, 110, 65, 20], borderColor: '#1D4ED8' }] }, options: { maintainAspectRatio: false } });
+        polymerChart = new Chart(cvPoly.getContext('2d'), { type: 'doughnut', data: { datasets: [{ data: [45, 45, 10], backgroundColor: ['#1D4ED8', '#F59E0B', '#10B981'] }], labels: ['Pure RG503H', 'Blended 제형', '기타'] }, options: { maintainAspectRatio: false } });
+        historicalChart = new Chart(cvHist.getContext('2d'), { type: 'line', data: { labels: ["D1","D7","D14","D21","D28","D42"], datasets: [{ label: 'Sema Target Run Successful', data: [121, 340, 180, 110, 65, 20], borderColor: '#1D4ED8' }] }, options: { maintainAspectRatio: false } });
         
         const t3d = { x: [875, 421, 227], y: [8743, 3812, 2089], z: [25, 10, 12], mode: 'markers', type: 'scatter3d', marker: { size: 8, color: '#10B981' } };
         Plotly.newPlot('scatter3dContainer', [t3d], { paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)' }, { displayModeBar: false });
@@ -596,14 +609,20 @@ function handleTirzPolyChange(changedKey, value) {
     } else {
         keys.forEach(k => { if (k !== changedKey) stateTirz[k] = parseFloat((remaining / 4).toFixed(1)); });
     }
-    keys.forEach(k => { document.getElementById(k).value = stateTirz[k]; document.getElementById(k + '_val').innerText = stateTirz[k] + '%'; });
+    keys.forEach(k => { 
+        const el = document.getElementById(k);
+        const lbl = document.getElementById(k + '_val');
+        if(el) el.value = stateTirz[k]; 
+        if(lbl) lbl.innerText = stateTirz[k] + '%'; 
+    });
     recalculateTirz();
 }
 
 function handleTirzParamChange(key, value) {
     stateTirz[key] = parseFloat(value);
     const units = { conc: ' mg/mL', loading: '%', dryingTemp: ' °C', feedRate: ' mL/min', dose: ' mg/kg' };
-    document.getElementById(key + '_val').innerText = value + (units[key] || '');
+    const lbl = document.getElementById(key + '_val');
+    if(lbl) lbl.innerText = value + (units[key] || '');
     recalculateTirz();
 }
 
@@ -613,7 +632,6 @@ function recalculateTirz() {
     const scaleRG504 = stateTirz.polyRG504H / 100; 
     const scaleRG653 = stateTirz.polyRG653H / 100;
 
-    // 💡 RG502H 비중에 결합된 선형 초기방출 가속 가중치 공식
     const burst1D = Math.max(1.2, (8.5 * (stateTirz.loading / 15.2) * (1.0 + scaleRG502 * 3.5) * (1 - scaleRG504 * 0.4) * (1 - scaleRG653 * 0.2) * (145 / stateTirz.dryingTemp)));
     const yieldPct = Math.min(99.5, Math.max(50.0, (94.5 + (stateTirz.dryingTemp - 135) * 0.12 - (stateTirz.feedRate - 5) * 0.5)));
     const residualAcid = Math.max(0.04, (0.28 * (145 / stateTirz.dryingTemp)));
@@ -628,24 +646,29 @@ function recalculateTirz() {
     const baseSD = targetLot.InVivo ? (targetLot.InVivo.CmaxSD || 35.4) : 35.4;
     const sdCmax = Math.round(baseSD * (stateTirz.loading / 15.2) * (1.0 + (stateTirz.dryingTemp - 120) * 0.005));
 
-    document.getElementById('status_yield').innerText = yieldPct.toFixed(1) + '%';
-    document.getElementById('status_acid').innerText = residualAcid.toFixed(3) + '%';
-    document.getElementById('status_burst').innerText = burst1D.toFixed(1) + '%';
-    document.getElementById('status_pk_summary').innerText = `${Cmax} ng/mL / ${AUClast}`;
+    const sYield = document.getElementById('status_yield');
+    const sAcid = document.getElementById('status_acid');
+    const sBurst = document.getElementById('status_burst');
+    const sSummary = document.getElementById('status_pk_summary');
+
+    if(sYield) sYield.innerText = yieldPct.toFixed(1) + '%';
+    if(sAcid) sAcid.innerText = residualAcid.toFixed(3) + '%';
+    if(sBurst) sBurst.innerText = burst1D.toFixed(1) + '%';
+    if(sSummary) sSummary.innerText = `${Cmax} ng/mL / ${AUClast}`;
 
     const acidCqaElement = document.getElementById('cqa_residual_acid');
     const burstCqaElement = document.getElementById('cqa_burst_1d');
-    const pkCmaxElement = document.getElementById('pk_cmax');
-    const pkTmaxElement = document.getElementById('pk_tmax');
-    const pkAucElement = document.getElementById('pk_auclast');
-    const pkHalfElement = document.getElementById('pk_halflife');
+    const tCmax = document.getElementById('pk_cmax');
+    const tTmax = document.getElementById('pk_tmax');
+    const tAuc = document.getElementById('pk_auclast');
+    const tHalf = document.getElementById('pk_halflife');
 
     if(acidCqaElement) acidCqaElement.innerText = residualAcid.toFixed(3) + '%';
     if(burstCqaElement) burstCqaElement.innerText = burst1D.toFixed(1) + '%';
-    if(pkCmaxElement) pkCmaxElement.innerHTML = `${Cmax} &plusmn; <span class="text-teal-400 font-bold">${sdCmax}</span>`;
-    if(pkTmaxElement) pkTmaxElement.innerText = Tmax.toFixed(1);
-    if(pkAucElement) pkAucElement.innerText = AUClast.toLocaleString();
-    if(pkHalfElement) pkHalfElement.innerText = halfLife.toFixed(2);
+    if(tCmax) tCmax.innerHTML = `${Cmax} &plusmn; <span class="text-teal-400 font-bold">${sdCmax}</span>`;
+    if(tTmax) tTmax.innerText = Tmax.toFixed(1);
+    if(tAuc) tAuc.innerText = AUClast.toLocaleString();
+    if(tHalf) tHalf.innerText = halfLife.toFixed(2);
 
     const days = [0.04, 0.13, 0.25, 0.5, 1.0, 2.0, 3.0, 7.0, 14.0, 21.0, 28.0, 35.0, 42.0];
     const curve = days.map(d => {
@@ -673,7 +696,6 @@ function renderTirzSVGChart(curve, cmaxVal, sdCmax) {
         l.setAttribute("stroke", "#1e293b"); l.setAttribute("stroke-dasharray", "4 4"); svg.appendChild(l);
     });
 
-    // 💡 [±SD Shaded Area 구간면적 렌더링 파트]
     let upperCoords = []; let lowerCoords = [];
     curve.forEach(pt => {
         const currentSD = sdCmax * (pt.conc / cmaxVal);
@@ -700,13 +722,15 @@ function renderTirzSVGChart(curve, cmaxVal, sdCmax) {
 }
 
 function runTirzOptimizationLoop() {
-    const consoleLog = document.getElementById('opt_log_console');
+    const consoleLog = document.getElementById('opt_log_console'); if(!consoleLog) return;
     consoleLog.innerHTML = "";
     const p = document.createElement('div'); p.textContent = "[Processing] 가상 다차원 유전 경계 탐색 연산 루프 가동 중..."; consoleLog.appendChild(p);
     setTimeout(() => {
         p.textContent = "[수렴 완료] 목표 스펙 최적 매칭 제형 산출 완료.";
-        document.getElementById('opt_result_container').classList.remove('hidden');
-        document.getElementById('opt_res_explanation').innerText = "초기 버스트 디펜스를 위해 RG653H 비율을 35%로 증량 보정하고, 중후반 타겟 피크 형성을 충족하기 위해 RG503H 기본 조성을 50%로 혼합 고정하는 AI 가속 SOP 레시피를 매칭 가이드합니다.";
+        const resBox = document.getElementById('opt_result_container');
+        if(resBox) resBox.classList.remove('hidden');
+        const exp = document.getElementById('opt_res_explanation');
+        if(exp) exp.innerText = "초기 버스트 디펜스를 위해 RG653H 비율을 35%로 증량 보정하고, 중후반 타겟 피크 형성을 충족하기 위해 RG503H 기본 조성을 50%로 혼합 고정하는 AI 가속 SOP 레시피를 매칭 가이드합니다.";
     }, 600);
 }
 
@@ -714,7 +738,10 @@ function applyTirzOptimized() {
     stateTirz.polyRG503H = 50; stateTirz.polyRG653H = 35; stateTirz.polyRG504H = 15;
     stateTirz.polyRG502H = 0; stateTirz.polyR202H = 0;
     ['polyRG503H', 'polyRG653H', 'polyRG504H', 'polyRG502H', 'polyR202H'].forEach(k => {
-        document.getElementById(k).value = stateTirz[k]; document.getElementById(k+'_val').innerText = stateTirz[k]+'%';
+        const el = document.getElementById(k);
+        const lbl = document.getElementById(k+'_val');
+        if(el) el.value = stateTirz[k]; 
+        if(lbl) lbl.innerText = stateTirz[k]+'%';
     });
     recalculateTirz(); switchTirzSubTab('predictor');
 }
@@ -801,13 +828,11 @@ function sendTirzChatMessage() {
         renderTirzChatHistory();    }, 400);
 }
 
-// 💡 안전한 DOM 맵핑 사후 렌더링 리스너 구조로 개편 (크래시 완벽 차단)
 document.addEventListener('DOMContentLoaded', () => {
     updateSemaPredictor();
     buildTirzExplorerTable();
     renderTirzChatHistory();
     
-    // 숨겨진 오버레이 선택자에 이벤트 리스너를 방어적으로 마운트
     const overlaySelector = document.getElementById('chart_overlay_selector');
     if(overlaySelector) {
         overlaySelector.addEventListener('change', (e) => { 
