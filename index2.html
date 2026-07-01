@@ -537,10 +537,6 @@ function executeSemaAIOptimize() {
     document.getElementById('recDryTemp').textContent = "142 °C";
     document.getElementById('recFeedRate').textContent = "6.8 mL/min";
     document.getElementById('recWashTime').textContent = "1.0% PVA / 180m";
-    document.getElementById('sopLoading').textContent = "13.5%";
-    document.getElementById('sopRG503').textContent = "78%";
-    document.getElementById('sopDryTemp').textContent = "142°C";
-    document.getElementById('sopFeedRate').textContent = "6.8";
 }
 
 function syncSemaFormulationInVitro() {
@@ -617,6 +613,7 @@ function recalculateTirz() {
     const scaleRG504 = stateTirz.polyRG504H / 100; 
     const scaleRG653 = stateTirz.polyRG653H / 100;
 
+    // 💡 RG502H 비중에 결합된 선형 초기방출 가속 가중치 공식
     const burst1D = Math.max(1.2, (8.5 * (stateTirz.loading / 15.2) * (1.0 + scaleRG502 * 3.5) * (1 - scaleRG504 * 0.4) * (1 - scaleRG653 * 0.2) * (145 / stateTirz.dryingTemp)));
     const yieldPct = Math.min(99.5, Math.max(50.0, (94.5 + (stateTirz.dryingTemp - 135) * 0.12 - (stateTirz.feedRate - 5) * 0.5)));
     const residualAcid = Math.max(0.04, (0.28 * (145 / stateTirz.dryingTemp)));
@@ -636,13 +633,19 @@ function recalculateTirz() {
     document.getElementById('status_burst').innerText = burst1D.toFixed(1) + '%';
     document.getElementById('status_pk_summary').innerText = `${Cmax} ng/mL / ${AUClast}`;
 
-    document.getElementById('cqa_residual_acid').innerText = residualAcid.toFixed(3) + '%';
-    document.getElementById('cqa_burst_1d').innerText = burst1D.toFixed(1) + '%';
-    
-    document.getElementById('pk_cmax').innerHTML = `${Cmax} &plusmn; <span class="text-teal-400 font-bold">${sdCmax}</span>`;
-    document.getElementById('pk_tmax').innerText = Tmax.toFixed(1);
-    document.getElementById('pk_auclast').innerText = AUClast.toLocaleString();
-    document.getElementById('pk_halflife').innerText = halfLife.toFixed(2);
+    const acidCqaElement = document.getElementById('cqa_residual_acid');
+    const burstCqaElement = document.getElementById('cqa_burst_1d');
+    const pkCmaxElement = document.getElementById('pk_cmax');
+    const pkTmaxElement = document.getElementById('pk_tmax');
+    const pkAucElement = document.getElementById('pk_auclast');
+    const pkHalfElement = document.getElementById('pk_halflife');
+
+    if(acidCqaElement) acidCqaElement.innerText = residualAcid.toFixed(3) + '%';
+    if(burstCqaElement) burstCqaElement.innerText = burst1D.toFixed(1) + '%';
+    if(pkCmaxElement) pkCmaxElement.innerHTML = `${Cmax} &plusmn; <span class="text-teal-400 font-bold">${sdCmax}</span>`;
+    if(pkTmaxElement) pkTmaxElement.innerText = Tmax.toFixed(1);
+    if(pkAucElement) pkAucElement.innerText = AUClast.toLocaleString();
+    if(pkHalfElement) pkHalfElement.innerText = halfLife.toFixed(2);
 
     const days = [0.04, 0.13, 0.25, 0.5, 1.0, 2.0, 3.0, 7.0, 14.0, 21.0, 28.0, 35.0, 42.0];
     const curve = days.map(d => {
@@ -670,6 +673,7 @@ function renderTirzSVGChart(curve, cmaxVal, sdCmax) {
         l.setAttribute("stroke", "#1e293b"); l.setAttribute("stroke-dasharray", "4 4"); svg.appendChild(l);
     });
 
+    // 💡 [±SD Shaded Area 구간면적 렌더링 파트]
     let upperCoords = []; let lowerCoords = [];
     curve.forEach(pt => {
         const currentSD = sdCmax * (pt.conc / cmaxVal);
@@ -679,11 +683,13 @@ function renderTirzSVGChart(curve, cmaxVal, sdCmax) {
         lowerCoords.unshift(`${dn.x},${dn.y}`);
     });
     
-    const polyPoints = upperCoords.concat(lowerCoords).join(" ");
-    const shadedArea = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-    shadedArea.setAttribute("points", polyPoints);
-    shadedArea.setAttribute("fill", "rgba(99, 102, 241, 0.12)");
-    svg.appendChild(shadedArea);
+    if (upperCoords.length > 0) {
+        const polyPoints = upperCoords.concat(lowerCoords).join(" ");
+        const shadedArea = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        shadedArea.setAttribute("points", polyPoints);
+        shadedArea.setAttribute("fill", "rgba(99, 102, 241, 0.12)");
+        svg.appendChild(shadedArea);
+    }
 
     const lot = TIRZ_HISTORICAL_LOTS.find(l => l.Lot === stateTirz.selectedLotForChart) || TIRZ_HISTORICAL_LOTS[0];
     let lotD = ""; lot.InVivo.curve.forEach((pt, idx) => { const c = getSvgCoords(pt.day, pt.conc); lotD += `${idx === 0 ? 'M' : 'L'} ${c.x} ${c.y}`; });
@@ -714,8 +720,10 @@ function applyTirzOptimized() {
 }
 
 function buildTirzExplorerTable() {
-    const selector = document.getElementById('chart_overlay_selector'); selector.innerHTML = "";
-    const tbody = document.getElementById('historical_lots_table_body'); tbody.innerHTML = "";        
+    const selector = document.getElementById('chart_overlay_selector'); if(!selector) return;
+    selector.innerHTML = "";
+    const tbody = document.getElementById('historical_lots_table_body'); if(!tbody) return;
+    tbody.innerHTML = "";        
     TIRZ_HISTORICAL_LOTS.forEach(lot => {
         const opt = document.createElement('option'); opt.value = lot.Lot; opt.textContent = lot.Lot; selector.appendChild(opt);
         const tr = document.createElement('tr'); tr.className = "border-b border-slate-800 hover:bg-slate-900/40 text-slate-300";
@@ -723,7 +731,6 @@ function buildTirzExplorerTable() {
         tbody.appendChild(tr);
     });
     selector.value = stateTirz.selectedLotForChart;
-    selector.addEventListener('change', (e) => { stateTirz.selectedLotForChart = e.target.value; recalculateTirz(); });
 }
 
 function loadTirzPreset(lotName) {
@@ -772,7 +779,8 @@ function renderMasterDataSheet() {
 }
 
 function renderTirzChatHistory() {
-    const container = document.getElementById('chat_messages_container'); container.innerHTML = '';
+    const container = document.getElementById('chat_messages_container'); if(!container) return;
+    container.innerHTML = '';
     stateTirz.chatHistory.forEach(msg => {
         const d = document.createElement('div'); d.className = `p-2.5 rounded-lg text-xs leading-relaxed ${msg.role==='user'?'bg-indigo-600 text-white text-right':'bg-slate-800 text-slate-200 border border-slate-700'}`;
         d.innerHTML = msg.text; container.appendChild(d);
@@ -793,11 +801,21 @@ function sendTirzChatMessage() {
         renderTirzChatHistory();    }, 400);
 }
 
-window.onload = function() {
+// 💡 안전한 DOM 맵핑 사후 렌더링 리스너 구조로 개편 (크래시 완벽 차단)
+document.addEventListener('DOMContentLoaded', () => {
     updateSemaPredictor();
     buildTirzExplorerTable();
     renderTirzChatHistory();
-};
+    
+    // 숨겨진 오버레이 선택자에 이벤트 리스너를 방어적으로 마운트
+    const overlaySelector = document.getElementById('chart_overlay_selector');
+    if(overlaySelector) {
+        overlaySelector.addEventListener('change', (e) => { 
+            stateTirz.selectedLotForChart = e.target.value; 
+            recalculateTirz(); 
+        });
+    }
+});
 </script>
 </body>
 </html>
