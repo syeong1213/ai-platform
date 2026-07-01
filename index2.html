@@ -40,7 +40,6 @@
         </div>    
     </nav>
 
-    <!-- 1. SEMAGLUTIDE PANEL (PT403) -->
     <div id="main-content-pt403" class="tab-panel max-w-7xl mx-auto px-6 py-4 space-y-4">        
         <div class="p-6 bg-slate-950 rounded-xl border border-slate-800 shadow-2xl">            
             <div class="flex justify-between items-start">                
@@ -190,7 +189,6 @@
         </div>    
     </div>
 
-    <!-- 2. TIRZEPATIDE PANEL (PT404 & PT414L) -->
     <div id="main-content-pt414l" class="tab-panel hidden max-w-7xl mx-auto px-6 py-4 space-y-4">        
         <div class="p-6 bg-slate-950 rounded-xl border border-slate-800 shadow-2xl">            
             <div class="flex justify-between items-start mb-2">                
@@ -241,13 +239,9 @@
                         <div><div class="flex justify-between mb-0.5"><span>투여량 (Dose mg/kg)</span><span id="lbl-414-dose" class="text-indigo-400 font-mono font-bold">2.0 mg/kg</span></div><input type="range" id="sld-414-dose" min="0.2" max="5.0" step="0.1" value="2.0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                    
                     </div>                    
                     <div class="lg:col-span-8 space-y-4">                        
-                        <!-- 💡 [결함 원천 해결 패치] Chart.js의 fill 한계를 우회하기 위해 canvas 위에 직접 하이브리드 SVG 레이어를 씌워 완벽하게 다각형 음영 구현 -->
-                        <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800 relative">                            
+                        <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800">                            
                             <p class="text-xs font-bold text-slate-300 mb-2">## In-Vivo Serum Concentration Simulator Graph (with &plusmn;SD Shaded Band)</p>                            
-                            <div class="relative w-full h-[340px]">
-                                <canvas id="predictChart414" class="absolute inset-0 w-full h-full z-10"></canvas>
-                                <svg id="chartShadedSvg" class="absolute inset-0 w-full h-full pointer-events-none z-0" style="padding-left:32px; padding-right:12px; padding-top:28px; padding-bottom:28px;"></svg>
-                            </div>
+                            <div class="chart-container"><canvas id="predictChart414"></canvas></div>                        
                         </div>                        
                         <div class="grid grid-cols-2 gap-4 text-xs font-mono">                            
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">                                
@@ -295,7 +289,6 @@
         </div>    
     </div>
 
-    <!-- 3. 마스터 통합 데이터 시트 PANEL -->
     <div id="main-content-datasheet" class="tab-panel hidden max-w-7xl mx-auto px-6 py-4 space-y-8">                
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">            
             <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col justify-between">                
@@ -416,6 +409,49 @@
             "PT414L Baseline Target": [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21]        
         };
 
+        // 💡 [혁신 패치] Chart.js 고유 레이어 충돌 결함을 완벽 파쇄하는 Canvas direct 컨텍스트 드로잉 플러그인 탑재
+        const canvasShadedBandPlugin = {
+            id: 'canvasShadedBand',
+            beforeDatasetsDraw(chart, args, pluginOptions) {
+                if (!pluginOptions || !pluginOptions.enabled || !pluginOptions.getSD) return;
+                
+                const { ctx, scales: { x, y } } = chart;
+                const dataset = chart.data.datasets[0];
+                if (!dataset || !dataset.data || dataset.data.length === 0) return;
+                
+                const sdValue = pluginOptions.getSD();
+                const meta = chart.getDatasetMeta(0);
+                
+                ctx.save();
+                ctx.beginPath();
+                
+                // 1단계: 상한선(+SD) 패스 구성
+                meta.data.forEach((point, index) => {
+                    const rawVal = dataset.data[index];
+                    const currentSD = sdValue * (rawVal / pluginOptions.cmaxVal);
+                    const pixelY = y.getPixelForValue(rawVal + currentSD);
+                    if (index === 0) ctx.moveTo(point.x, pixelY);
+                    else ctx.lineTo(point.x, pixelY);
+                });
+                
+                // 2단계: 하한선(-SD) 반대방향 패스 구성 후 다각형 닫기
+                for (let index = meta.data.length - 1; index >= 0; index--) {
+                    const rawVal = dataset.data[index];
+                    const currentSD = sdValue * (rawVal / pluginOptions.cmaxVal);
+                    const pixelY = y.getPixelForValue(Math.max(0, rawVal - currentSD));
+                    ctx.lineTo(meta.data[index].x, pixelY);
+                }
+                
+                ctx.closePath();
+                ctx.fillStyle = pluginOptions.color || 'rgba(99, 102, 241, 0.08)';
+                ctx.fill();
+                ctx.restore();
+            }
+        };
+
+        // 전역 플러그인 저장소 등록 완료
+        Chart.register(canvasShadedBandPlugin);
+
         window.addEventListener('DOMContentLoaded', () => {            
             initLineCharts();            
             initIvivcCharts();            
@@ -447,18 +483,11 @@
         }
 
         function switchSubTab(proj, subId) {            
-            const panels = document.querySelectorAll(`#main-content-${proj} .sub-panel`);
-            const btns = document.querySelectorAll(`#main-content-${proj} .sub-tab-btn`);
-            
-            panels.forEach(p => p.classList.add('hidden'));            
-            btns.forEach(b => b.classList.remove('active', 'text-white'));
+            document.querySelectorAll(`#main-content-${proj} .sub-panel`).forEach(p => p.classList.add('hidden'));            
+            document.querySelectorAll(`#main-content-${proj} .sub-tab-btn`).forEach(b => b.classList.remove('active', 'text-white'));
 
-            const targetPanel = document.getElementById(`sub-panel-${proj}-${subId}`);
-            const targetBtn = document.getElementById(`sub-btn-${proj}-${subId}`);
-            
-            if (targetPanel) targetPanel.classList.remove('hidden');            
-            if (targetBtn) targetBtn.classList.add('active', 'text-white');                        
-            
+            document.getElementById(`sub-panel-${proj}-${subId}`).classList.remove('hidden');            
+            document.getElementById(`sub-btn-${proj}-${subId}`).classList.add('active', 'text-white');                        
             if(subId === 'info') { Plotly.Plots.resize('plotly3DWorkspace'); }        
         }
 
@@ -496,15 +525,34 @@
             runPt414Engine();        
         }
 
+        let dynamicSemaSD = 12.39;
+        let dynamicSemaCmax = 282.60;
+        let dynamicTirzSD = 35.4;
+        let dynamicTirzCmax = 656.23;
+
         function initLineCharts() {            
             const ctx3 = document.getElementById('predictChart403').getContext('2d');            
             sChart = new Chart(ctx3, {                
                 type: 'line',                
                 data: {                    
                     labels: ['Day 0', 'Day 1', 'Day 3', 'Day 5', 'Day 7', 'Day 14', 'Day 21', 'Day 28', 'Day 35', 'Day 42'],                    
-                    datasets: [{ label: 'Predicted Profile', data: [0, 12.6, 45, 150, 282.6, 210, 140, 71, 18, 1.9], borderColor: '#2dd4bf', borderWidth: 2.5, backgroundColor: 'rgba(45, 212, 191, 0.04)', fill: true, tension: 0.15, pointRadius: 2 }]                
+                    datasets: [{ label: 'Predicted Profile', data: [0, 12.6, 45, 150, 282.6, 210, 140, 71, 18, 1.9], borderColor: '#2dd4bf', borderWidth: 2.5, fill: false, tension: 0.15, pointRadius: 2 }]                
                 },                
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
+                // 💡 1번 세마글루타이드 엔진 전용 실시간 캔버스 드로잉 플러그인 파라미터 매핑 완수
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: false },
+                        canvasShadedBand: {
+                            enabled: true,
+                            color: 'rgba(45, 212, 191, 0.08)',
+                            getSD: () => dynamicSemaSD,
+                            get cmaxVal() { return dynamicSemaCmax; }
+                        }
+                    }, 
+                    scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } 
+                }            
             });
 
             const ctx4 = document.getElementById('predictChart414').getContext('2d');            
@@ -512,13 +560,26 @@
                 type: 'line',                
                 data: {                    
                     labels: ['Day 0.04', 'Day 0.5', 'Day 1', 'Day 3', 'Day 5', 'Day 7', 'Day 11', 'Day 14', 'Day 21', 'Day 28'],                    
-                    // 💡 [완벽 결함 조치] 브라우저 간 fill 옵션 충돌 가능성을 전면 제거하고 단일 예측선과 대조선만 깨끗하게 플로팅
                     datasets: [                        
                         { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15 },                        
                         { label: 'Tirzepatide API Control (Free)', data: [680, 420, 110, 8, 0, 0, 0, 0, 0, 0], borderColor: '#f43f5e', borderWidth: 2, borderDash: [3, 3], fill: false, tension: 0.15 }                    
                     ]                
                 },                
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
+                // 💡 2번 티르제파타이드 엔진 전용 실시간 캔버스 드로잉 플러그인 파라미터 매핑 완수
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 } } },
+                        canvasShadedBand: {
+                            enabled: true,
+                            color: 'rgba(99, 102, 241, 0.1)',
+                            getSD: () => dynamicTirzSD,
+                            get cmaxVal() { return dynamicTirzCmax; }
+                        }
+                    }, 
+                    scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } 
+                }            
             });        
         }
 
@@ -642,7 +703,11 @@
             let cmax = currentBaseline403.cmax * f;            
             let auc = (currentBaseline403.cmax * 10.7) * f;
 
-            document.getElementById('res-403-cmax').innerText = cmax.toFixed(2) + " ng/mL";            
+            // 💡 1번 엔진 실시간 글로벌 바인딩 팩터 전송
+            dynamicSemaCmax = cmax;
+            dynamicSemaSD = 12.39 * (load / currentBaseline403.load) * (1.0 + (Number(temp) - 130) * 0.005);
+
+            document.getElementById('res-403-cmax').innerHTML = `${cmax.toFixed(2)} &plusmn; <span class="text-teal-400 font-bold">${dynamicSemaSD.toFixed(1)}</span>`;            
             document.getElementById('res-403-auc').innerText = auc.toFixed(2) + " ng·day/mL";
 
             if (sChart) {                
@@ -670,34 +735,6 @@
             const feed = document.getElementById('sld-414-feed').value;            
             const dose = document.getElementById('sld-414-dose').value;
 
-            document.getElementById('lbl-414-rg502').innerText = Number(t502).toFixed(1) + "%";
-            document.getElementById('lbl-414-rg503').innerText = Number(t3).toFixed(1) + "%";            
-            document.getElementById('lbl-414-rg504').innerText = Number(t4).toFixed(1) + "%";            
-            document.getElementById('lbl-414-rg653').innerText = Number(t653).toFixed(1) + "%";            
-            document.getElementById('lbl-414-rg752').innerText = Number(t752).toFixed(1) + "%";            
-            document.getElementById('lbl-414-rg753').innerText = Number(t753).toFixed(1) + "%";            
-            document.getElementById('lbl-414-rg753s').innerText = Number(t753s).toFixed(1) + "%";            
-            document.getElementById('lbl-414-r202').innerText = Number(r202).toFixed(1) + "%";            
-            document.getElementById('lbl-414-r203').innerText = Number(r203).toFixed(1) + "%";            
-            document.getElementById('lbl-414-r205s').innerText = Number(r205s).toFixed(1) + "%";            
-            document.getElementById('lbl-414-pdlg').innerText = Number(pdlg).toFixed(1) + "%";            
-
-            document.getElementById('lbl-414-rg502').className = Number(t502) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";
-            document.getElementById('lbl-414-rg752').className = Number(t752) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-rg653').className = Number(t653) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-rg753').className = Number(t753) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-rg753s').className = Number(t753s) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-r202').className = Number(r202) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-r203').className = Number(r203) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-r205s').className = Number(r205s) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-            document.getElementById('lbl-414-pdlg').className = Number(pdlg) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
-
-            document.getElementById('lbl-414-pconc').innerText = pconc + " mg/mL";            
-            document.getElementById('lbl-414-load').innerText = load + "%";            
-            document.getElementById('lbl-414-temp').innerText = temp + "°C";            
-            document.getElementById('lbl-414-feed').innerText = feed + " mL/min";            
-            document.getElementById('lbl-414-dose').innerText = dose + " mg/kg";
-
             let polyWeight = (Number(t502)*0.85 + Number(t3) + Number(t4)*1.05 + Number(t653)*1.1 + Number(t752)*1.15 + Number(t753)*1.2 + Number(t753s)*1.18 + Number(r202)*1.3 + Number(r203)*1.35 + Number(r205s)*1.32 + Number(pdlg)*1.22) / 100;            
             let factor = polyWeight * (pconc/currentBaseline414.pconc) * (load/currentBaseline414.load) * (temp/currentBaseline414.temp) * (currentBaseline414.feed/feed) * (dose/2.0);                        
             
@@ -708,7 +745,9 @@
             let gaa = Math.max(0.01, 0.090 * (currentBaseline414.temp/temp));            
             let brst = 19.78 * (load/currentBaseline414.load) * burstFactor;
 
-            let sdCmax = Math.round(35.4 * (load / currentBaseline414.load) * (1.0 + (Number(temp) - 135) * 0.004));
+            // 💡 2번 엔진 실시간 글로벌 바인딩 팩터 전송
+            dynamicTirzCmax = cx;
+            dynamicTirzSD = Math.round(35.4 * (load / currentBaseline414.load) * (1.0 + (Number(temp) - 135) * 0.004));
 
             document.getElementById('t_status_pk_summary').innerText = `${cx.toFixed(2)} / ${ac.toFixed(1)}`;            
             document.getElementById('t_status_yield').innerText = yld.toFixed(2) + "%";            
@@ -717,43 +756,12 @@
             
             document.getElementById('cqa-414-gaa').innerText = gaa.toFixed(3) + "%";            
             document.getElementById('cqa-414-burst').innerText = brst.toFixed(2) + "%";            
-            document.getElementById('pk-414-cmax').innerHTML = `${cx.toFixed(2)} &plusmn; <span class="text-teal-400 font-bold">${sdCmax}</span>`;            
+            document.getElementById('pk-414-cmax').innerHTML = `${cx.toFixed(2)} &plusmn; <span class="text-teal-400 font-bold">${dynamicTirzSD}</span>`;            
             document.getElementById('pk-414-auc').innerText = ac.toFixed(2);
 
             if(tChart) {                
-                let baseProfile = [33*factor*burstFactor, 194*factor*burstFactor, 302*factor*(1.0 + (burstFactor-1)*0.2), 147*factor, cx, 317*factor, 141*factor, 174*factor, 161*factor, 21];
-                tChart.data.datasets[0].data = baseProfile;                
+                tChart.data.datasets[0].data = [33*factor*burstFactor, 194*factor*burstFactor, 302*factor*(1.0 + (burstFactor-1)*0.2), 147*factor, cx, 317*factor, 141*factor, 174*factor, 161*factor, 21];                
                 tChart.update();            
-
-                // 💡 [수정 완성 핵심부] Chart.js 내부의 좌표축 매핑 공간 값을 역추적하여 SVG 다각형 영역을 정밀 드로잉
-                const svg = document.getElementById('chartShadedSvg');
-                if(svg) {
-                    svg.innerHTML = '';
-                    const meta = tChart.getDatasetMeta(0);
-                    let upperPoints = [];
-                    let lowerPoints = [];
-
-                    baseProfile.forEach((v, index) => {
-                        const currentSD = sdCmax * (v / cx);
-                        const modelX = meta.data[index].x;
-                        
-                        // 차트 캔버스 좌표축 변환 맵핑
-                        const yPixelTop = tChart.scales.y.getPixelForValue(v + currentSD);
-                        const yPixelBottom = tChart.scales.y.getPixelForValue(Math.max(0, v - currentSD));
-                        
-                        // 캔버스 마진 보정 가이드 적용
-                        upperPoints.push(`${modelX - 32},${yPixelTop - 28}`);
-                        lowerPoints.unshift(`${modelX - 32},${yPixelBottom - 28}`);
-                    });
-
-                    if(upperPoints.length > 0) {
-                        const totalPathStr = upperPoints.concat(lowerPoints).join(' ');
-                        const polygonNode = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-                        polygonNode.setAttribute("points", totalPathStr);
-                        polygonNode.setAttribute("fill", "rgba(99, 102, 241, 0.12)");
-                        svg.appendChild(polygonNode);
-                    }
-                }
             }        
         }
 
@@ -779,8 +787,6 @@
         function handleExcelUpload(event) {            
             const file = event.target.files[0];            
             if (!file) return;
-
-            document.getElementById('upload-status-text').innerText = "엑셀 구조 파싱 중...";            
             const reader = new FileReader();                        
             reader.onload = function(e) {                
                 const data = new Uint8Array(e.target.result);                
@@ -829,9 +835,7 @@
                     tbody.appendChild(tr);                    
                     validCount++;                
                 }
-
-                document.getElementById('upload-status-text').innerText = `완료: ${validCount}건 적재`;                
-                alert(`[엑셀 적재 완료] 총 ${validCount}개의 핵심 데이터가 3번 뷰어에 덤프되었으며, 1, 2번 엔진 연산 조건이 초기화되었습니다.`);                
+                alert(`[엑셀 적재 완료] 총 ${validCount}개의 핵심 데이터가 3번 뷰어에 덤프되었습니다.`);                
                 filterMasterTable();            
             };            
             reader.readAsArrayBuffer(file);        
@@ -891,7 +895,7 @@
             const tbody = document.getElementById('tbl-grand-master-body');            
             if (tbody) {                
                 tbody.insertBefore(tr, tbody.firstChild);                
-                alert(`[데이터 마운트] 로트 ${lot} 전체 공정 결합 엔트리가 마스터 시트에 누적되었습니다.`);                
+                alert(`[데이터 마운트] 로트 ${lot} 전체 엔트리가 마스터 시트에 누적되었습니다.`);                
                 syncEngineBaselines();            
             }        
         }
