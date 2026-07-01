@@ -440,18 +440,11 @@
         }
 
         function switchSubTab(proj, subId) {            
-            const panels = document.querySelectorAll(`#main-content-${proj} .sub-panel`);
-            const btns = document.querySelectorAll(`#main-content-${proj} .sub-tab-btn`);
-            
-            panels.forEach(p => p.classList.add('hidden'));            
-            btns.forEach(b => b.classList.remove('active', 'text-white'));
+            document.querySelectorAll(`#main-content-${proj} .sub-panel`).forEach(p => p.classList.add('hidden'));            
+            document.querySelectorAll(`#main-content-${proj} .sub-tab-btn`).forEach(b => b.classList.remove('active', 'text-white'));
 
-            const targetPanel = document.getElementById(`sub-panel-${proj}-${subId}`);
-            const targetBtn = document.getElementById(`sub-btn-${proj}-${subId}`);
-            
-            if (targetPanel) targetPanel.classList.remove('hidden');            
-            if (targetBtn) targetBtn.classList.add('active', 'text-white');                        
-            
+            document.getElementById(`sub-panel-${proj}-${subId}`).classList.remove('hidden');            
+            document.getElementById(`sub-btn-${proj}-${subId}`).classList.add('active', 'text-white');                        
             if(subId === 'info') { Plotly.Plots.resize('plotly3DWorkspace'); }        
         }
 
@@ -505,15 +498,14 @@
                 type: 'line',                
                 data: {                    
                     labels: ['Day 0.04', 'Day 0.5', 'Day 1', 'Day 3', 'Day 5', 'Day 7', 'Day 11', 'Day 14', 'Day 21', 'Day 28'],                    
-                    // 💡 [수정 포인트 1] 2번 탭 차트에 +SD, -SD 레이어를 신설하여 다중 면적 채우기 구조 형성
                     datasets: [                        
-                        { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15, z: 10 },                        
-                        { label: '+SD Upper Band', data: [53, 234, 342, 182, 691.63, 352, 176, 209, 196, 41], borderColor: 'transparent', fill: '+1', backgroundColor: 'rgba(99, 102, 241, 0.06)', pointRadius: 0, tension: 0.15 },
-                        { label: '-SD Lower Band', data: [13, 154, 262, 112, 620.83, 282, 106, 139, 126, 1], borderColor: 'transparent', fill: false, backgroundColor: 'rgba(99, 102, 241, 0.06)', pointRadius: 0, tension: 0.15 },
+                        { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15 },                        
+                        { label: '+SD Upper Band', data: [], borderColor: 'transparent', fill: '+1', backgroundColor: 'rgba(99, 102, 241, 0.05)', pointRadius: 0, tension: 0.15 },
+                        { label: '-SD Lower Band', data: [], borderColor: 'transparent', fill: false, backgroundColor: 'rgba(99, 102, 241, 0.05)', pointRadius: 0, tension: 0.15 },
                         { label: 'Tirzepatide API Control (Free)', data: [680, 420, 110, 8, 0, 0, 0, 0, 0, 0], borderColor: '#f43f5e', borderWidth: 2, borderDash: [3, 3], fill: false, tension: 0.15 }                    
                     ]                
                 },                
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 }, filter: (item) => !item.text.includes('Band') } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 }, filter: (item) => !item.text.includes('Limit') && !item.text.includes('Band') } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
             });        
         }
 
@@ -665,20 +657,27 @@
             const feed = document.getElementById('sld-414-feed').value;            
             const dose = document.getElementById('sld-414-dose').value;
 
-            const targets = [
-                { id: 'rg502', val: t502 }, { id: 'rg503', val: t3 }, { id: 'rg504', val: t4 },
-                { id: 'rg653', val: t653 }, { id: 'rg752', val: t752 }, { id: 'rg753', val: t753 },
-                { id: 'rg753s', val: t753s }, { id: 'r202', val: r202 }, { id: 'r203', val: r203 },
-                { id: 'r205s', val: r205s }, { id: 'pdlg', val: pdlg }
-            ];
-            
-            targets.forEach(item => {
-                const element = document.getElementById(`lbl-414-${item.id}`);
-                if (element) {
-                    element.innerText = Number(item.val).toFixed(1) + "%";
-                    element.className = Number(item.val) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";
-                }
-            });
+            document.getElementById('lbl-414-rg502').innerText = Number(t502).toFixed(1) + "%";
+            document.getElementById('lbl-414-rg503').innerText = Number(t3).toFixed(1) + "%";            
+            document.getElementById('lbl-414-rg504').innerText = Number(t4).toFixed(1) + "%";            
+            document.getElementById('lbl-414-rg653').innerText = Number(t653).toFixed(1) + "%";            
+            document.getElementById('lbl-414-rg752').innerText = Number(t752).toFixed(1) + "%";            
+            document.getElementById('lbl-414-rg753').innerText = Number(t753).toFixed(1) + "%";            
+            document.getElementById('lbl-414-rg753s').innerText = Number(t753s).toFixed(1) + "%";            
+            document.getElementById('lbl-414-r202').innerText = Number(r202).toFixed(1) + "%";            
+            document.getElementById('lbl-414-r203').innerText = Number(r203).toFixed(1) + "%";            
+            document.getElementById('lbl-414-r205s').innerText = Number(r205s).toFixed(1) + "%";            
+            document.getElementById('lbl-414-pdlg').innerText = Number(pdlg).toFixed(1) + "%";            
+
+            document.getElementById('lbl-414-rg502').className = Number(t502) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";
+            document.getElementById('lbl-414-rg752').className = Number(t752) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
+            document.getElementById('lbl-414-rg653').className = Number(t653) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
+            document.getElementById('lbl-414-rg753').className = Number(t753) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
+            document.getElementById('lbl-414-rg753s').className = Number(t753s) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
+            document.getElementById('lbl-414-r202').className = Number(r202) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
+            document.getElementById('lbl-414-r203').className = Number(r203) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
+            document.getElementById('lbl-414-r205s').className = Number(r205s) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
+            document.getElementById('lbl-414-pdlg').className = Number(pdlg) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";            
 
             document.getElementById('lbl-414-pconc').innerText = pconc + " mg/mL";            
             document.getElementById('lbl-414-load').innerText = load + "%";            
@@ -686,9 +685,10 @@
             document.getElementById('lbl-414-feed').innerText = feed + " mL/min";            
             document.getElementById('lbl-414-dose').innerText = dose + " mg/kg";
 
-            let polyWeight = (Number(t502)*0.85 + Number(t3) + Number(t4)*1.05 + Number(t653)*1.1 + Number(t752)*1.15 + Number(t753)*1.2 + Number(t753s)*1.18 + Number(r202)*1.3 + Number(t502)*0.85 + Number(r203)*1.35 + Number(r205s)*1.32 + Number(pdlg)*1.22) / 100;            
+            let polyWeight = (Number(t502)*0.85 + Number(t3) + Number(t4)*1.05 + Number(t653)*1.1 + Number(t752)*1.15 + Number(t753)*1.2 + Number(t753s)*1.18 + Number(r202)*1.3 + Number(r203)*1.35 + Number(r205s)*1.32 + Number(pdlg)*1.22) / 100;            
             let factor = polyWeight * (pconc/currentBaseline414.pconc) * (load/currentBaseline414.load) * (temp/currentBaseline414.temp) * (currentBaseline414.feed/feed) * (dose/2.0);                        
             
+            // RG502H 지수함수 비선형 가속 버스트 유도
             let burstFactor = Math.exp((Number(t502) / 100) * 2.8);
             let cx = currentBaseline414.cmax * factor * (1.0 + (burstFactor - 1.0) * 0.4);            
             let ac = (currentBaseline414.cmax * 7.85) * factor;            
@@ -696,7 +696,7 @@
             let gaa = Math.max(0.01, 0.090 * (currentBaseline414.temp/temp));            
             let brst = 19.78 * (load/currentBaseline414.load) * burstFactor;
 
-            // 💡 [수정 포인트 2] 개체간 편차 분포 규격을 모사하기 위한 동적 SD 오차 마운트 연산 가동
+            // 실시간 변수 기반 동적 SD 마운트 
             let sdCmax = Math.round(35.4 * (load / currentBaseline414.load) * (1.0 + (Number(temp) - 135) * 0.004));
 
             document.getElementById('t_status_pk_summary').innerText = `${cx.toFixed(2)} / ${ac.toFixed(1)}`;            
@@ -706,15 +706,11 @@
             
             document.getElementById('cqa-414-gaa').innerText = gaa.toFixed(3) + "%";            
             document.getElementById('cqa-414-burst').innerText = brst.toFixed(2) + "%";            
-            
-            // 💡 하단 PK 파라미터 요약판에 ±SD가 실시간 가변 반영되도록 엘리먼트 주입
             document.getElementById('pk-414-cmax').innerHTML = `${cx.toFixed(2)} &plusmn; <span class="text-teal-400 font-bold">${sdCmax}</span>`;            
             document.getElementById('pk-414-auc').innerText = ac.toFixed(2);
 
             if(tChart) {                
                 let baseProfile = [33*factor*burstFactor, 194*factor*burstFactor, 302*factor*(1.0 + (burstFactor-1)*0.2), 147*factor, cx, 317*factor, 141*factor, 174*factor, 161*factor, 21];
-                
-                // 💡 [수정 포인트 3] 각 타임 포인트별로 동적으로 수렴되는 상한 및 하한 데이터 세트를 차트 객체에 실시간 피딩
                 let upperProfile = baseProfile.map(v => v + (sdCmax * (v / cx)));
                 let lowerProfile = baseProfile.map(v => Math.max(0, v - (sdCmax * (v / cx))));
 
@@ -727,7 +723,7 @@
 
         function buildTirzOverlaySelector() {            
             const sel = document.getElementById('chart_overlay_selector');            
-            if(!sel) return; 
+            if(!sel) return;
             sel.innerHTML = '';            
             Object.keys(TIRZ_OVERLAYS).forEach(k => {                
                 let opt = document.createElement('option');                
@@ -744,7 +740,6 @@
             }        
         }
 
-        // 🌟 순수 일반 정식 Excel (.xlsx / .xls) 바이너리 파서 엔진        
         function handleExcelUpload(event) {            
             const file = event.target.files[0];            
             if (!file) return;
