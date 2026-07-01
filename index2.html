@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SR Peptide AI Formulation & PK Master Platform</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -40,7 +40,6 @@
         </div>    
     </nav>
 
-    <!-- 1. SEMAGLUTIDE PANEL (PT403) -->
     <div id="main-content-pt403" class="tab-panel max-w-7xl mx-auto px-6 py-4 space-y-4">        
         <div class="p-6 bg-slate-950 rounded-xl border border-slate-800 shadow-2xl">            
             <div class="flex justify-between items-start">                
@@ -144,7 +143,8 @@
                     </div>                    
                     <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-center">                        
                         <span class="text-slate-500 text-[11px]">f2 유사성인자</span>                        
-                        <span id="txt-ivivc-f2" class="text-amber-500 font-mono text-sm font-bold">68.5</span>                    </div>                    
+                        <span id="txt-ivivc-f2" class="text-amber-500 font-mono text-sm font-bold">68.5</span>                    
+                    </div>                    
                     <div id="box-biowaiver" class="bg-emerald-950/40 border border-emerald-800 p-3 rounded-xl flex flex-col justify-center items-center">                        
                         <span class="text-emerald-500 text-[10px] uppercase font-bold tracking-wider">Biowaiver</span>                        
                         <span class="text-emerald-400 font-black text-sm mt-0.5">승인 적합 (PASS)</span>                    
@@ -189,7 +189,6 @@
         </div>    
     </div>
 
-    <!-- 2. TIRZEPATIDE PANEL (PT404 & PT414L) -->
     <div id="main-content-pt414l" class="tab-panel hidden max-w-7xl mx-auto px-6 py-4 space-y-4">        
         <div class="p-6 bg-slate-950 rounded-xl border border-slate-800 shadow-2xl">            
             <div class="flex justify-between items-start mb-2">                
@@ -225,7 +224,7 @@
                         <div><div class="flex justify-between mb-0.5"><span>RG752H (High LA Ratio PLGA)</span><span id="lbl-414-rg752" class="text-amber-400 font-mono">25.0%</span></div><input type="range" id="sld-414-rg752" min="0" max="100" step="0.1" value="25.0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
                         <div><div class="flex justify-between mb-0.5"><span>RG755S (Ultra High MW PLGA)</span><span id="lbl-414-rg755" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-rg755" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
                         <div><div class="flex justify-between mb-0.5"><span>R202H (PLA Ester End)</span><span id="lbl-414-r202" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-r202" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
-                        <div><div class="flex justify-between mb-0.5"><span>RG502H (Low MW PLGA)</span><span id="lbl-414-rg502" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-rg502" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                                                
+                        <div><div class="flex justify-between mb-0.5"><span>RG502H (Low MW PLGA) ➔ Burst 유도</span><span id="lbl-414-rg502" class="text-slate-500 font-mono">0.0%</span></div><input type="range" id="sld-414-rg502" min="0" max="100" step="0.1" value="0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                                                
                         <h4 class="font-bold text-slate-200 border-b border-slate-800 pb-1.5 pt-1 mb-1">공정 및 투여 변수 조절</h4>                        
                         <div><div class="flex justify-between mb-0.5"><span>고분자 농도 (mg/mL)</span><span id="lbl-414-pconc" class="text-slate-300 font-mono">50 mg/mL</span></div><input type="range" id="sld-414-pconc" min="10" max="150" value="50" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
                         <div><div class="flex justify-between mb-0.5"><span>반제 API Loading (%)</span><span id="lbl-414-load" class="text-slate-300 font-mono">10.25%</span></div><input type="range" id="sld-414-load" min="5" max="25" step="0.05" value="10.25" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                        
@@ -284,7 +283,6 @@
         </div>    
     </div>
 
-    <!-- 3. 마스터 통합 데이터 시트 PANEL -->
     <div id="main-content-datasheet" class="tab-panel hidden max-w-7xl mx-auto px-6 py-4 space-y-8">                
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">            
             <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col justify-between">                
@@ -414,7 +412,7 @@
             buildTirzOverlaySelector();        
         });
 
-        // 탭 스위칭 전면 간소화 및 완전 직렬 제어 로직        
+        // 💡 [완벽 복구] 3번 탭의 정상 가시화를 위해 대상 타겟 라우팅 ID를 datasheet 매칭으로 수정
         function switchProject(target) {            
             document.getElementById('main-content-pt403').classList.add('hidden');            
             document.getElementById('main-content-pt414l').classList.add('hidden');            
@@ -445,7 +443,6 @@
             if(subId === 'info') { Plotly.Plots.resize('plotly3DWorkspace'); }        
         }
 
-        // 엑셀 가변 데이터 연동 팩터 연산을 위한 기준 추적 동기화 함수        
         function syncEngineBaselines() {            
             const rows = document.querySelectorAll('#tbl-grand-master-body tr');            
             let found414 = false, found403 = false;
@@ -453,7 +450,6 @@
             rows.forEach(row => {                
                 if (row.style.display === "none") return;                
                 const proj = row.cells[0].innerText.trim();                                
-                // 가시 영역 내 첫 번째 일치 프로젝트 라인을 타겟 상속 기준점으로 채택                
                 if((proj === "PT414L" || proj === "PT404") && !found414) {                    
                     currentBaseline414.lot = row.cells[1].innerText.trim();                    
                     currentBaseline414.pconc = parseFloat(row.cells[2].innerText) || 50;                    
@@ -622,7 +618,6 @@
             document.getElementById('lbl-403-feed').innerText = feed + " mL/min";            
             document.getElementById('lbl-403-dose').innerText = dose + " mg/kg";
 
-            // 동적 엑셀 배킹 기준값 연산 대입            
             let f = (r503/100) * (pconc/currentBaseline403.pconc) * (load/currentBaseline403.load) * (temp/currentBaseline403.temp) * (currentBaseline403.feed/feed) * (dose/2.0);            
             let cmax = currentBaseline403.cmax * f;            
             let auc = (currentBaseline403.cmax * 10.7) * f;
@@ -663,7 +658,6 @@
             document.getElementById('lbl-414-rg502').className = Number(t502) > 0 ? "text-amber-400 font-mono" : "text-slate-500 font-mono";
 
             let polyWeight = (Number(t3) + Number(t4)*1.05 + Number(t752)*1.15 + Number(t755)*1.25 + Number(r202)*1.3 + Number(t502)*0.85) / 100;            
-            // 동적 엑셀 배킹 기준값 연산 대입            
             let factor = polyWeight * (pconc/currentBaseline414.pconc) * (load/currentBaseline414.load) * (temp/currentBaseline414.temp) * (currentBaseline414.feed/feed) * (dose/2.0);                        
             
             let cx = currentBaseline414.cmax * factor;            
@@ -671,7 +665,7 @@
             let yld = Math.min(99.5, 78.50 * (temp/currentBaseline414.temp));            
             let gaa = Math.max(0.01, 0.090 * (currentBaseline414.temp/temp));            
             
-            // 💡 [핵심 교정 패치] RG502H 비율 상승에 비례하여 1일 차 초기 방출량이 최대 2.5배까지 동적으로 늘어나도록 물리 수식 연동
+            // 💡 RG502H 비중에 결합된 선형 초기방출 가속 가중치 공식
             let brst = 19.78 * (load/currentBaseline414.load) * (1.0 + (Number(t502) / 100) * 1.5);
 
             document.getElementById('t_status_pk_summary').innerText = `${cx.toFixed(2)} / ${ac.toFixed(1)}`;            
@@ -690,10 +684,10 @@
             }        
         }
 
-        // 💡 [구동 엔진 브레이크 차단 방어] 존재하지 않는 엘리먼트 참조로 인한 먹통 예방 구조화
+        // 💡 [2번 탭 그래프 크래시 복구] 엘리먼트 존재 여부를 체크하여 차트 렌더링 정상화
         function buildTirzOverlaySelector() {            
             const sel = document.getElementById('chart_overlay_selector');            
-            if(!sel) return;
+            if(!sel) return; // 팩터 누락 오류 방지
             sel.innerHTML = '';            
             Object.keys(TIRZ_OVERLAYS).forEach(k => {                
                 let opt = document.createElement('option');                
@@ -767,12 +761,11 @@
 
                 document.getElementById('upload-status-text').innerText = `완료: ${validCount}건 적재`;                
                 alert(`[엑셀 적재 완료] 총 ${validCount}개의 핵심 데이터가 3번 뷰어에 덤프되었으며, 1, 2번 엔진 연산 조건이 초기화되었습니다.`);                
-                filterMasterTable(); // 동기화 팩터 즉시 유도            
+                filterMasterTable();        
             };            
             reader.readAsArrayBuffer(file);        
         }
 
-        // 실시간 정보 검색 및 마스터 시뮬레이션 연동 트리거 함수        
         function filterMasterTable() {            
             const query = document.getElementById('masterSearchInput').value.toLowerCase();            
             const rows = document.querySelectorAll('#tbl-grand-master-body tr');
@@ -787,7 +780,6 @@
                 }                
                 row.style.display = match ? "" : "none";            
             });                        
-            // 검색 필터링 조건에 부합해 가시적으로 남은 최상단 데이터를 기반으로 1, 2번 연동 가중치 재분배            
             syncEngineBaselines();        
         }
 
