@@ -64,7 +64,7 @@
                         <h3 class="font-bold text-slate-200 border-b border-slate-800 pb-1.5 mb-2">고분자 매트릭스 및 공정 변수 컨트롤</h3>                        
                         <div>                            
                             <div class="flex justify-between mb-1"><span>Polymer Matrix (RG503H Ratio)</span><span id="lbl-403-rg503" class="text-teal-400 font-mono font-bold">100%</span></div>                            
-                            <input type="range" id="sld-403-rg503" min="0" max="100" value="100" oninput="runPt403 Engine()" class="w-full accent-teal-500">                        
+                            <input type="range" id="sld-403-rg503" min="0" max="100" value="100" oninput="runPt403Engine()" class="w-full accent-teal-500">                        
                         </div>                        
                         <div>                            
                             <div class="flex justify-between mb-1"><span>고분자 농도 (mg/mL)</span><span id="lbl-403-pconc" class="text-slate-300 font-mono">30 mg/mL</span></div>                            
@@ -240,7 +240,7 @@
                     </div>                    
                     <div class="lg:col-span-8 space-y-4">                        
                         <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800">                            
-                            <p class="text-xs font-bold text-slate-300 mb-2">## In-Vivo Serum Concentration Simulator Graph (vs Native Tirzepatide API Free Control)</p>                            
+                            <p class="text-xs font-bold text-slate-300 mb-2">## In-Vivo Serum Concentration Simulator Graph (with &plusmn;SD Shaded Band)</p>                            
                             <div class="chart-container"><canvas id="predictChart414"></canvas></div>                        
                         </div>                        
                         <div class="grid grid-cols-2 gap-4 text-xs font-mono">                            
@@ -439,7 +439,6 @@
             }        
         }
 
-        // 서브 탭 제어 함수 수정 (크래시 및 누락 방지 안정화)
         function switchSubTab(proj, subId) {            
             const panels = document.querySelectorAll(`#main-content-${proj} .sub-panel`);
             const btns = document.querySelectorAll(`#main-content-${proj} .sub-tab-btn`);
@@ -506,12 +505,15 @@
                 type: 'line',                
                 data: {                    
                     labels: ['Day 0.04', 'Day 0.5', 'Day 1', 'Day 3', 'Day 5', 'Day 7', 'Day 11', 'Day 14', 'Day 21', 'Day 28'],                    
+                    // 💡 [수정 포인트 1] 2번 탭 차트에 +SD, -SD 레이어를 신설하여 다중 면적 채우기 구조 형성
                     datasets: [                        
-                        { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15 },                        
+                        { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15, z: 10 },                        
+                        { label: '+SD Upper Band', data: [53, 234, 342, 182, 691.63, 352, 176, 209, 196, 41], borderColor: 'transparent', fill: '+1', backgroundColor: 'rgba(99, 102, 241, 0.06)', pointRadius: 0, tension: 0.15 },
+                        { label: '-SD Lower Band', data: [13, 154, 262, 112, 620.83, 282, 106, 139, 126, 1], borderColor: 'transparent', fill: false, backgroundColor: 'rgba(99, 102, 241, 0.06)', pointRadius: 0, tension: 0.15 },
                         { label: 'Tirzepatide API Control (Free)', data: [680, 420, 110, 8, 0, 0, 0, 0, 0, 0], borderColor: '#f43f5e', borderWidth: 2, borderDash: [3, 3], fill: false, tension: 0.15 }                    
                     ]                
                 },                
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 }, filter: (item) => !item.text.includes('Band') } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
             });        
         }
 
@@ -645,7 +647,6 @@
         }
 
         function runPt414Engine() {            
-            // 11종 확장 고분자 파라미터 수집 구조 확립
             const t502 = document.getElementById('sld-414-rg502').value;
             const t3 = document.getElementById('sld-414-rg503').value;            
             const t4 = document.getElementById('sld-414-rg504').value;            
@@ -664,7 +665,6 @@
             const feed = document.getElementById('sld-414-feed').value;            
             const dose = document.getElementById('sld-414-dose').value;
 
-            // 11종 라벨 가시성 업데이트 적용
             const targets = [
                 { id: 'rg502', val: t502 }, { id: 'rg503', val: t3 }, { id: 'rg504', val: t4 },
                 { id: 'rg653', val: t653 }, { id: 'rg752', val: t752 }, { id: 'rg753', val: t753 },
@@ -680,14 +680,13 @@
                 }
             });
 
-            document.getElementById('lbl-414-pconc').innerText = pconc + " mg/mL";
-            document.getElementById('lbl-414-load').innerText = load + "%";
-            document.getElementById('lbl-414-temp').innerText = temp + "°C";
-            document.getElementById('lbl-414-feed').innerText = feed + " mL/min";
+            document.getElementById('lbl-414-pconc').innerText = pconc + " mg/mL";            
+            document.getElementById('lbl-414-load').innerText = load + "%";            
+            document.getElementById('lbl-414-temp').innerText = temp + "°C";            
+            document.getElementById('lbl-414-feed').innerText = feed + " mL/min";            
             document.getElementById('lbl-414-dose').innerText = dose + " mg/kg";
 
-            // 가중치 매트릭스 계산 연동
-            let polyWeight = (Number(t502)*0.85 + Number(t3) + Number(t4)*1.05 + Number(t653)*1.1 + Number(t752)*1.15 + Number(t753)*1.2 + Number(t753s)*1.18 + Number(r202)*1.3 + Number(r203)*1.35 + Number(r205s)*1.32 + Number(pdlg)*1.22) / 100;            
+            let polyWeight = (Number(t502)*0.85 + Number(t3) + Number(t4)*1.05 + Number(t653)*1.1 + Number(t752)*1.15 + Number(t753)*1.2 + Number(t753s)*1.18 + Number(r202)*1.3 + Number(t502)*0.85 + Number(r203)*1.35 + Number(r205s)*1.32 + Number(pdlg)*1.22) / 100;            
             let factor = polyWeight * (pconc/currentBaseline414.pconc) * (load/currentBaseline414.load) * (temp/currentBaseline414.temp) * (currentBaseline414.feed/feed) * (dose/2.0);                        
             
             let burstFactor = Math.exp((Number(t502) / 100) * 2.8);
@@ -697,6 +696,9 @@
             let gaa = Math.max(0.01, 0.090 * (currentBaseline414.temp/temp));            
             let brst = 19.78 * (load/currentBaseline414.load) * burstFactor;
 
+            // 💡 [수정 포인트 2] 개체간 편차 분포 규격을 모사하기 위한 동적 SD 오차 마운트 연산 가동
+            let sdCmax = Math.round(35.4 * (load / currentBaseline414.load) * (1.0 + (Number(temp) - 135) * 0.004));
+
             document.getElementById('t_status_pk_summary').innerText = `${cx.toFixed(2)} / ${ac.toFixed(1)}`;            
             document.getElementById('t_status_yield').innerText = yld.toFixed(2) + "%";            
             document.getElementById('t_status_acid').innerText = gaa.toFixed(3) + "%";            
@@ -704,18 +706,28 @@
             
             document.getElementById('cqa-414-gaa').innerText = gaa.toFixed(3) + "%";            
             document.getElementById('cqa-414-burst').innerText = brst.toFixed(2) + "%";            
-            document.getElementById('pk-414-cmax').innerText = cx.toFixed(2) + " &plusmn; 35.4";            
+            
+            // 💡 하단 PK 파라미터 요약판에 ±SD가 실시간 가변 반영되도록 엘리먼트 주입
+            document.getElementById('pk-414-cmax').innerHTML = `${cx.toFixed(2)} &plusmn; <span class="text-teal-400 font-bold">${sdCmax}</span>`;            
             document.getElementById('pk-414-auc').innerText = ac.toFixed(2);
 
             if(tChart) {                
-                tChart.data.datasets[0].data = [33*factor*burstFactor, 194*factor*burstFactor, 302*factor*(1.0 + (burstFactor-1)*0.2), 147*factor, cx, 317*factor, 141*factor, 174*factor, 161*factor, 21];                
+                let baseProfile = [33*factor*burstFactor, 194*factor*burstFactor, 302*factor*(1.0 + (burstFactor-1)*0.2), 147*factor, cx, 317*factor, 141*factor, 174*factor, 161*factor, 21];
+                
+                // 💡 [수정 포인트 3] 각 타임 포인트별로 동적으로 수렴되는 상한 및 하한 데이터 세트를 차트 객체에 실시간 피딩
+                let upperProfile = baseProfile.map(v => v + (sdCmax * (v / cx)));
+                let lowerProfile = baseProfile.map(v => Math.max(0, v - (sdCmax * (v / cx))));
+
+                tChart.data.datasets[0].data = baseProfile;                
+                tChart.data.datasets[1].data = upperProfile;                
+                tChart.data.datasets[2].data = lowerProfile;                
                 tChart.update();            
             }        
         }
 
         function buildTirzOverlaySelector() {            
             const sel = document.getElementById('chart_overlay_selector');            
-            if(!sel) return;
+            if(!sel) return; 
             sel.innerHTML = '';            
             Object.keys(TIRZ_OVERLAYS).forEach(k => {                
                 let opt = document.createElement('option');                
@@ -726,8 +738,8 @@
 
         function changeTirzOverlay(lotId) {            
             if(tChart && TIRZ_OVERLAYS[lotId]) {                
-                tChart.data.datasets[1].data = TIRZ_OVERLAYS[lotId];                
-                tChart.data.datasets[1].label = lotId;                
+                tChart.data.datasets[3].data = TIRZ_OVERLAYS[lotId];                
+                tChart.data.datasets[3].label = lotId;                
                 tChart.update();            
             }        
         }
