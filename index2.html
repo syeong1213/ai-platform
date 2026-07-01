@@ -331,7 +331,7 @@
                 <div class="lg:col-span-5 bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">                    
                     <h3 class="font-bold border-b border-slate-800 pb-2">🎯 원하는 타겟 파라미터 정의</h3>                    
                     <div><label class="block mb-1">목표 Cmax 최고농도 (ng/mL)</label><input type="number" id="target_cmax" value="400" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
-                    <div><label class="block mb-1">목aint Tmax 도달 시간 (일)</label><input type="number" id="target_tmax" value="14" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
+                    <div><label class="block mb-1">목표 Tmax 도달 시간 (일)</label><input type="number" id="target_tmax" value="14" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
                     <div><label class="block mb-1">목표 AUC_last (ng*day/mL)</label><input type="number" id="target_auc" value="6000" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
                     <div><label class="block mb-1">목표 1일차 Burst 허용한계 (%)</label><input type="number" id="target_burst" value="10" class="w-full bg-slate-900 p-2 rounded border border-slate-700 text-white focus:outline-none focus:border-indigo-500"></div>                    
                     <button id="opt_action_btn" onclick="runTirzOptimizationLoop()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded transition-all">🚀 AI 제형 최적화 시작</button>                
@@ -444,8 +444,6 @@ function switchProject(type) {
 }
 
 function switchSemaSubTab(mode) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-white'));
-    
     const pContent = document.getElementById('predictTabContent');
     const iContent = document.getElementById('ivivcTabContent');
     const aContent = document.getElementById('analyticsTabContent');
@@ -455,6 +453,8 @@ function switchSemaSubTab(mode) {
     if(iContent) iContent.classList.add('hidden');
     if(aContent) aContent.classList.add('hidden');
     if(prContent) prContent.classList.add('hidden');
+
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-white'));
 
     if (mode === 'predict') {
         document.getElementById('tabPredict').classList.add('active', 'text-white');
@@ -632,6 +632,7 @@ function recalculateTirz() {
     const scaleRG504 = stateTirz.polyRG504H / 100; 
     const scaleRG653 = stateTirz.polyRG653H / 100;
 
+    // 💡 동적 수식 연산 매핑 파트
     const burst1D = Math.max(1.2, (8.5 * (stateTirz.loading / 15.2) * (1.0 + scaleRG502 * 3.5) * (1 - scaleRG504 * 0.4) * (1 - scaleRG653 * 0.2) * (145 / stateTirz.dryingTemp)));
     const yieldPct = Math.min(99.5, Math.max(50.0, (94.5 + (stateTirz.dryingTemp - 135) * 0.12 - (stateTirz.feedRate - 5) * 0.5)));
     const residualAcid = Math.max(0.04, (0.28 * (145 / stateTirz.dryingTemp)));
@@ -646,6 +647,7 @@ function recalculateTirz() {
     const baseSD = targetLot.InVivo ? (targetLot.InVivo.CmaxSD || 35.4) : 35.4;
     const sdCmax = Math.round(baseSD * (stateTirz.loading / 15.2) * (1.0 + (stateTirz.dryingTemp - 120) * 0.005));
 
+    // 💡 [완벽 교정] 고정값 대신 실제 계산된 동적 팩터를 대시보드 엘리먼트에 다이렉트 맵핑
     const sYield = document.getElementById('status_yield');
     const sAcid = document.getElementById('status_acid');
     const sBurst = document.getElementById('status_burst');
@@ -696,6 +698,7 @@ function renderTirzSVGChart(curve, cmaxVal, sdCmax) {
         l.setAttribute("stroke", "#1e293b"); l.setAttribute("stroke-dasharray", "4 4"); svg.appendChild(l);
     });
 
+    // ±SD Shaded Area 실시간 구간 연산 면적 처리
     let upperCoords = []; let lowerCoords = [];
     curve.forEach(pt => {
         const currentSD = sdCmax * (pt.conc / cmaxVal);
