@@ -40,6 +40,7 @@
         </div>    
     </nav>
 
+    <!-- 1. SEMAGLUTIDE PANEL (PT403) -->
     <div id="main-content-pt403" class="tab-panel max-w-7xl mx-auto px-6 py-4 space-y-4">        
         <div class="p-6 bg-slate-950 rounded-xl border border-slate-800 shadow-2xl">            
             <div class="flex justify-between items-start">                
@@ -189,6 +190,7 @@
         </div>    
     </div>
 
+    <!-- 2. TIRZEPATIDE PANEL (PT404 & PT414L) -->
     <div id="main-content-pt414l" class="tab-panel hidden max-w-7xl mx-auto px-6 py-4 space-y-4">        
         <div class="p-6 bg-slate-950 rounded-xl border border-slate-800 shadow-2xl">            
             <div class="flex justify-between items-start mb-2">                
@@ -214,6 +216,7 @@
             </div>            
             <div id="sub-panel-pt414l-sim" class="sub-panel active mt-6 space-y-6">                
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">                    
+                    <!-- 11종 고분자 매트릭스 UI 컴포넌트 풀 어레이 구현 -->
                     <div class="lg:col-span-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3 text-[11px] font-semibold max-h-[580px] overflow-y-auto">                        
                         <div class="flex justify-between items-center border-b border-slate-800 pb-1.5 mb-1">                            
                             <h4 class="font-bold text-slate-200">SR-Tirzepatide 마스터 고분자 매트릭스</h4>                            
@@ -289,6 +292,7 @@
         </div>    
     </div>
 
+    <!-- 3. 마스터 통합 데이터 시트 PANEL -->
     <div id="main-content-datasheet" class="tab-panel hidden max-w-7xl mx-auto px-6 py-4 space-y-8">                
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">            
             <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col justify-between">                
@@ -498,14 +502,15 @@
                 type: 'line',                
                 data: {                    
                     labels: ['Day 0.04', 'Day 0.5', 'Day 1', 'Day 3', 'Day 5', 'Day 7', 'Day 11', 'Day 14', 'Day 21', 'Day 28'],                    
+                    // 💡 [교정 파트] Chart.js의 선형 레이어 결합 특성에 맞춰 fill 타겟 인덱스 스크립트 전면 정정
                     datasets: [                        
-                        { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15 },                        
-                        { label: '+SD Upper Band', data: [], borderColor: 'transparent', fill: '+1', backgroundColor: 'rgba(99, 102, 241, 0.05)', pointRadius: 0, tension: 0.15 },
-                        { label: '-SD Lower Band', data: [], borderColor: 'transparent', fill: false, backgroundColor: 'rgba(99, 102, 241, 0.05)', pointRadius: 0, tension: 0.15 },
+                        { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15, z: 10 },                        
+                        { label: '+SD Upper Band', data: [53, 234, 342, 182, 691.63, 352, 176, 209, 196, 41], borderColor: 'transparent', fill: 2, backgroundColor: 'rgba(99, 102, 241, 0.08)', pointRadius: 0, tension: 0.15 },
+                        { label: '-SD Lower Band', data: [13, 154, 262, 112, 620.83, 282, 106, 139, 126, 1], borderColor: 'transparent', fill: false, backgroundColor: 'rgba(99, 102, 241, 0.08)', pointRadius: 0, tension: 0.15 },
                         { label: 'Tirzepatide API Control (Free)', data: [680, 420, 110, 8, 0, 0, 0, 0, 0, 0], borderColor: '#f43f5e', borderWidth: 2, borderDash: [3, 3], fill: false, tension: 0.15 }                    
                     ]                
                 },                
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 }, filter: (item) => !item.text.includes('Limit') && !item.text.includes('Band') } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 }, filter: (item) => !item.text.includes('Band') } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
             });        
         }
 
@@ -688,7 +693,6 @@
             let polyWeight = (Number(t502)*0.85 + Number(t3) + Number(t4)*1.05 + Number(t653)*1.1 + Number(t752)*1.15 + Number(t753)*1.2 + Number(t753s)*1.18 + Number(r202)*1.3 + Number(r203)*1.35 + Number(r205s)*1.32 + Number(pdlg)*1.22) / 100;            
             let factor = polyWeight * (pconc/currentBaseline414.pconc) * (load/currentBaseline414.load) * (temp/currentBaseline414.temp) * (currentBaseline414.feed/feed) * (dose/2.0);                        
             
-            // RG502H 지수함수 비선형 가속 버스트 유도
             let burstFactor = Math.exp((Number(t502) / 100) * 2.8);
             let cx = currentBaseline414.cmax * factor * (1.0 + (burstFactor - 1.0) * 0.4);            
             let ac = (currentBaseline414.cmax * 7.85) * factor;            
@@ -696,7 +700,6 @@
             let gaa = Math.max(0.01, 0.090 * (currentBaseline414.temp/temp));            
             let brst = 19.78 * (load/currentBaseline414.load) * burstFactor;
 
-            // 실시간 변수 기반 동적 SD 마운트 
             let sdCmax = Math.round(35.4 * (load / currentBaseline414.load) * (1.0 + (Number(temp) - 135) * 0.004));
 
             document.getElementById('t_status_pk_summary').innerText = `${cx.toFixed(2)} / ${ac.toFixed(1)}`;            
@@ -723,7 +726,7 @@
 
         function buildTirzOverlaySelector() {            
             const sel = document.getElementById('chart_overlay_selector');            
-            if(!sel) return;
+            if(!sel) return; 
             sel.innerHTML = '';            
             Object.keys(TIRZ_OVERLAYS).forEach(k => {                
                 let opt = document.createElement('option');                
