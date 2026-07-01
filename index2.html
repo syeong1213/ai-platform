@@ -241,9 +241,13 @@
                         <div><div class="flex justify-between mb-0.5"><span>투여량 (Dose mg/kg)</span><span id="lbl-414-dose" class="text-indigo-400 font-mono font-bold">2.0 mg/kg</span></div><input type="range" id="sld-414-dose" min="0.2" max="5.0" step="0.1" value="2.0" oninput="runPt414Engine()" class="w-full accent-indigo-500"></div>                    
                     </div>                    
                     <div class="lg:col-span-8 space-y-4">                        
-                        <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800">                            
+                        <!-- 💡 [결함 원천 해결 패치] Chart.js의 fill 한계를 우회하기 위해 canvas 위에 직접 하이브리드 SVG 레이어를 씌워 완벽하게 다각형 음영 구현 -->
+                        <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800 relative">                            
                             <p class="text-xs font-bold text-slate-300 mb-2">## In-Vivo Serum Concentration Simulator Graph (with &plusmn;SD Shaded Band)</p>                            
-                            <div class="chart-container"><canvas id="predictChart414"></canvas></div>                        
+                            <div class="relative w-full h-[340px]">
+                                <canvas id="predictChart414" class="absolute inset-0 w-full h-full z-10"></canvas>
+                                <svg id="chartShadedSvg" class="absolute inset-0 w-full h-full pointer-events-none z-0" style="padding-left:32px; padding-right:12px; padding-top:28px; padding-bottom:28px;"></svg>
+                            </div>
                         </div>                        
                         <div class="grid grid-cols-2 gap-4 text-xs font-mono">                            
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">                                
@@ -315,7 +319,7 @@
                 <div>                    
                     <h2 class="text-sm font-black text-white flex items-center gap-2 mb-2">                        
                         <i class="fa-solid fa-magnifying-glass text-sky-400"></i> 데이터 정보 탐색 및 동적 필터링 바                    </h2>                    
-                    <p class="text-[11px] text-slate-400">마스터 시트 전체 레코드를 대상으로 실시간 스캔을 진행합니다. 로트 번호, 공정 조건, 유연물질 수치 및 비고 사양의 텍스트가 모두 통합 검색 범위에 포함됩니다.</p>                
+                    <p class="text-[11px] text-slate-400">마스터 시트 전체 레코드를 대상으로 실시간 스캔을 진행합니다. 로트 번호, 공정 조건, 유연물질 수치 및 비고 사양의 텍스트가 모두 통합 검색 범위에 포함된다.</p>                
                 </div>                
                 <div class="relative mt-4">                    
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">                        
@@ -443,11 +447,18 @@
         }
 
         function switchSubTab(proj, subId) {            
-            document.querySelectorAll(`#main-content-${proj} .sub-panel`).forEach(p => p.classList.add('hidden'));            
-            document.querySelectorAll(`#main-content-${proj} .sub-tab-btn`).forEach(b => b.classList.remove('active', 'text-white'));
+            const panels = document.querySelectorAll(`#main-content-${proj} .sub-panel`);
+            const btns = document.querySelectorAll(`#main-content-${proj} .sub-tab-btn`);
+            
+            panels.forEach(p => p.classList.add('hidden'));            
+            btns.forEach(b => b.classList.remove('active', 'text-white'));
 
-            document.getElementById(`sub-panel-${proj}-${subId}`).classList.remove('hidden');            
-            document.getElementById(`sub-btn-${proj}-${subId}`).classList.add('active', 'text-white');                        
+            const targetPanel = document.getElementById(`sub-panel-${proj}-${subId}`);
+            const targetBtn = document.getElementById(`sub-btn-${proj}-${subId}`);
+            
+            if (targetPanel) targetPanel.classList.remove('hidden');            
+            if (targetBtn) targetBtn.classList.add('active', 'text-white');                        
+            
             if(subId === 'info') { Plotly.Plots.resize('plotly3DWorkspace'); }        
         }
 
@@ -501,15 +512,13 @@
                 type: 'line',                
                 data: {                    
                     labels: ['Day 0.04', 'Day 0.5', 'Day 1', 'Day 3', 'Day 5', 'Day 7', 'Day 11', 'Day 14', 'Day 21', 'Day 28'],                    
-                    // 💡 [완벽 교정 파트] 상한 레이아웃(인덱스 1)이 하한 레이아웃(인덱스 2)의 데이터 경계 조건으로 누적 병합되도록 맵핑 관계 전면 확립
+                    // 💡 [완벽 결함 조치] 브라우저 간 fill 옵션 충돌 가능성을 전면 제거하고 단일 예측선과 대조선만 깨끗하게 플로팅
                     datasets: [                        
-                        { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15, z: 10 },                        
-                        { label: '+SD Upper Band', data: [53, 234, 342, 182, 691.63, 352, 176, 209, 196, 41], borderColor: 'transparent', fill: 2, backgroundColor: 'rgba(99, 102, 241, 0.08)', pointRadius: 0, tension: 0.15 },
-                        { label: '-SD Lower Band', data: [13, 154, 262, 112, 620.83, 282, 106, 139, 126, 1], borderColor: 'transparent', fill: false, backgroundColor: 'rgba(99, 102, 241, 0.08)', pointRadius: 0, tension: 0.15 },
+                        { label: 'AI Predict Profile (PT404/PT414L)', data: [33, 194, 302, 147, 656.23, 317, 141, 174, 161, 21], borderColor: '#6366f1', borderWidth: 3, fill: false, tension: 0.15 },                        
                         { label: 'Tirzepatide API Control (Free)', data: [680, 420, 110, 8, 0, 0, 0, 0, 0, 0], borderColor: '#f43f5e', borderWidth: 2, borderDash: [3, 3], fill: false, tension: 0.15 }                    
                     ]                
                 },                
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 }, filter: (item) => !item.text.includes('Band') } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 } } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } }, y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 9 } } } } }            
             });        
         }
 
@@ -713,19 +722,44 @@
 
             if(tChart) {                
                 let baseProfile = [33*factor*burstFactor, 194*factor*burstFactor, 302*factor*(1.0 + (burstFactor-1)*0.2), 147*factor, cx, 317*factor, 141*factor, 174*factor, 161*factor, 21];
-                let upperProfile = baseProfile.map(v => v + (sdCmax * (v / cx)));
-                let lowerProfile = baseProfile.map(v => Math.max(0, v - (sdCmax * (v / cx))));
-
                 tChart.data.datasets[0].data = baseProfile;                
-                tChart.data.datasets[1].data = upperProfile;                
-                tChart.data.datasets[2].data = lowerProfile;                
                 tChart.update();            
+
+                // 💡 [수정 완성 핵심부] Chart.js 내부의 좌표축 매핑 공간 값을 역추적하여 SVG 다각형 영역을 정밀 드로잉
+                const svg = document.getElementById('chartShadedSvg');
+                if(svg) {
+                    svg.innerHTML = '';
+                    const meta = tChart.getDatasetMeta(0);
+                    let upperPoints = [];
+                    let lowerPoints = [];
+
+                    baseProfile.forEach((v, index) => {
+                        const currentSD = sdCmax * (v / cx);
+                        const modelX = meta.data[index].x;
+                        
+                        // 차트 캔버스 좌표축 변환 맵핑
+                        const yPixelTop = tChart.scales.y.getPixelForValue(v + currentSD);
+                        const yPixelBottom = tChart.scales.y.getPixelForValue(Math.max(0, v - currentSD));
+                        
+                        // 캔버스 마진 보정 가이드 적용
+                        upperPoints.push(`${modelX - 32},${yPixelTop - 28}`);
+                        lowerPoints.unshift(`${modelX - 32},${yPixelBottom - 28}`);
+                    });
+
+                    if(upperPoints.length > 0) {
+                        const totalPathStr = upperPoints.concat(lowerPoints).join(' ');
+                        const polygonNode = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                        polygonNode.setAttribute("points", totalPathStr);
+                        polygonNode.setAttribute("fill", "rgba(99, 102, 241, 0.12)");
+                        svg.appendChild(polygonNode);
+                    }
+                }
             }        
         }
 
         function buildTirzOverlaySelector() {            
             const sel = document.getElementById('chart_overlay_selector');            
-            if(!sel) return;
+            if(!sel) return; 
             sel.innerHTML = '';            
             Object.keys(TIRZ_OVERLAYS).forEach(k => {                
                 let opt = document.createElement('option');                
@@ -736,8 +770,8 @@
 
         function changeTirzOverlay(lotId) {            
             if(tChart && TIRZ_OVERLAYS[lotId]) {                
-                tChart.data.datasets[3].data = TIRZ_OVERLAYS[lotId];                
-                tChart.data.datasets[3].label = lotId;                
+                tChart.data.datasets[1].data = TIRZ_OVERLAYS[lotId];                
+                tChart.data.datasets[1].label = lotId;                
                 tChart.update();            
             }        
         }
